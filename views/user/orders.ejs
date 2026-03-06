@@ -1,0 +1,95 @@
+<% layout('layouts/main') %>
+    <div class="container mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+            <!-- Sidebar -->
+            <aside class="w-full lg:w-64 space-y-4">
+                <div class="glass p-8 rounded-[2rem] text-center mb-6">
+                    <div
+                        class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[1.5rem] flex items-center justify-center text-white text-3xl font-black mb-4">
+                        <%= user.firstName.charAt(0) %>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 line-clamp-1">
+                        <%= user.lastName %>
+                            <%= user.firstName %>
+                    </h2>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="/tai-khoan/don-hang"
+                        class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold transition-all shadow-lg shadow-blue-500/20">
+                        <span>📦</span> Đơn hàng của tôi
+                    </a>
+                    <a href="/tai-khoan"
+                        class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all border border-slate-100">
+                        <span>👤</span> Thông tin cá nhân
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <div class="glass p-10 rounded-[3rem] shadow-xl">
+                    <h2 class="text-3xl font-black mb-8">Lịch Sử Mua Hàng</h2>
+
+                    <% if (orders.length===0) { %>
+                        <div class="text-center py-20">
+                            <div class="text-6xl mb-4">📦</div>
+                            <p class="text-slate-500 font-medium">Bạn chưa có đơn hàng nào.</p>
+                            <a href="/san-pham" class="text-blue-600 font-bold hover:underline">Tiếp tục mua sắm</a>
+                        </div>
+                        <% } else { %>
+                            <div class="space-y-6">
+                                <% orders.forEach(order=> { %>
+                                    <div
+                                        class="p-8 rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-all bg-slate-50/50">
+                                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                            <div>
+                                                <div class="flex items-center gap-3 mb-2">
+                                                    <span
+                                                        class="text-sm font-black text-slate-400 uppercase tracking-tighter">#
+                                                        <%= order.orderCode %>
+                                                    </span>
+                                                    <% let statusClass='bg-yellow-100 text-yellow-600' ; let
+                                                        statusName='Chờ xử lý' ; if(order.orderStatus==='delivered' ) {
+                                                        statusClass='bg-emerald-100 text-emerald-600' ;
+                                                        statusName='Đã giao hàng' ; } if(order.orderStatus==='cancelled'
+                                                        ) { statusClass='bg-red-100 text-red-600' ; statusName='Đã hủy'
+                                                        ; } %>
+                                                        <span
+                                                            class="px-3 py-1 rounded-lg <%= statusClass %> text-[10px] font-bold uppercase tracking-widest">
+                                                            <%= statusName %>
+                                                        </span>
+                                                </div>
+                                                <p class="text-sm text-slate-500 font-medium">
+                                                    Ngày đặt: <span class="text-slate-900 underline">
+                                                        <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                    </span> •
+                                                    Mục: <span class="font-bold text-slate-900">
+                                                        <%= order.items.length %> sản phẩm
+                                                    </span>
+                                                </p>
+                                            </div>
+
+                                            <div class="flex items-center gap-8">
+                                                <div class="text-right">
+                                                    <p
+                                                        class="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+                                                        Tổng tiền</p>
+                                                    <p class="text-2xl font-black text-blue-600">
+                                                        <%= order.totalAmount.toLocaleString('vi-VN') %>đ
+                                                    </p>
+                                                </div>
+                                                <a href="/tai-khoan/don-hang/<%= order.orderCode %>"
+                                                    class="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition-all">Chi
+                                                    tiết</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } %>
+                </div>
+            </main>
+        </div>
+    </div>

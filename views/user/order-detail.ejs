@@ -1,0 +1,160 @@
+<% layout('layouts/main') %>
+    <div class="container mx-auto px-6 py-10">
+
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-10">
+                <a href="/tai-khoan/don-hang"
+                    class="text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors flex items-center gap-2">
+                    ← Quay lại đơn hàng
+                </a>
+                <div class="text-right">
+                    <h1 class="text-3xl font-black text-slate-900">Đơn hàng #<%= order.orderCode %>
+                    </h1>
+                    <p class="text-sm text-slate-500 font-medium">Đặt ngày <%= new
+                            Date(order.createdAt).toLocaleString('vi-VN') %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <!-- Order Progress -->
+                <div class="md:col-span-2 space-y-8">
+                    <div class="glass p-10 rounded-[3rem]">
+                        <h2 class="text-xl font-bold mb-8">Trạng thái đơn hàng</h2>
+                        <div class="space-y-6">
+                            <% order.statusHistory.slice().reverse().forEach((history, idx)=> { %>
+                                <div class="flex gap-4 relative">
+                                    <% if(idx < order.statusHistory.length - 1) { %>
+                                        <div class="absolute left-[11px] top-8 bottom-[-24px] w-0.5 bg-slate-100"></div>
+                                        <% } %>
+                                            <div
+                                                class="w-6 h-6 rounded-full border-4 <%= idx === 0 ? 'border-blue-600 bg-blue-100' : 'border-slate-200 bg-white' %> z-10">
+                                            </div>
+                                            <div>
+                                                <p
+                                                    class="text-sm font-black <%= idx === 0 ? 'text-blue-600' : 'text-slate-700' %> uppercase tracking-widest">
+                                                    <%= history.status %>
+                                                </p>
+                                                <p class="text-sm text-slate-500 font-medium">
+                                                    <%= history.note %>
+                                                </p>
+                                                <p class="text-[10px] text-slate-400 font-bold mt-1">
+                                                    <%= new Date(history.updatedAt).toLocaleString('vi-VN') %>
+                                                </p>
+                                            </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+
+                    <div class="glass p-10 rounded-[3rem]">
+                        <h2 class="text-xl font-bold mb-8">Sản phẩm trong đơn</h2>
+                        <div class="space-y-6">
+                            <% order.items.forEach(item=> { %>
+                                <div class="flex items-center gap-6 p-4 rounded-2xl bg-slate-50/50">
+                                    <div class="w-20 h-20 bg-white rounded-xl p-2 shrink-0 shadow-sm">
+                                        <img src="<%= item.thumbnail %>" class="w-full h-full object-contain">
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h4 class="font-bold text-slate-800">
+                                            <%= item.name %>
+                                        </h4>
+                                        <p class="text-xs text-slate-400">SL: <%= item.quantity %> x <%=
+                                                    item.price.toLocaleString('vi-VN') %>đ</p>
+                                    </div>
+                                    <span class="font-black text-slate-900">
+                                        <%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ
+                                    </span>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <aside class="space-y-8">
+                    <div class="glass p-8 rounded-[3rem] shadow-xl">
+                        <h3 class="font-bold mb-6">Thông tin nhận hàng</h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Địa chỉ</p>
+                                <p class="font-bold text-slate-800">
+                                    <%= order.shippingAddress.street %>, <%= order.shippingAddress.ward %>, <%=
+                                                order.shippingAddress.district %>, <%= order.shippingAddress.city %>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Số điện thoại
+                                </p>
+                                <p class="font-bold text-slate-800">
+                                    <%= order.shippingAddress.phone %>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Thanh toán
+                                </p>
+                                <p class="font-bold text-blue-600 uppercase tracking-tighter">
+                                    <%= order.paymentMethod %> (<%= order.paymentStatus %>)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="h-px bg-slate-100 my-8"></div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm text-slate-500">
+                                <span>Tạm tính:</span>
+                                <span class="font-bold text-slate-800">
+                                    <%= order.subtotal.toLocaleString('vi-VN') %>đ
+                                </span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-500">
+                                <span>Phí ship:</span>
+                                <span class="font-bold text-emerald-500">0đ</span>
+                            </div>
+                            <div
+                                class="flex justify-between text-2xl font-black pt-4 border-t border-slate-100 text-blue-600">
+                                <span>Tổng số:</span>
+                                <span>
+                                    <%= order.totalAmount.toLocaleString('vi-VN') %>đ
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if(order.orderStatus==='pending' ) { %>
+                        <div class="p-6 rounded-[2rem] bg-red-50 border border-red-100 text-center">
+                            <button onclick="cancelOrder('<%= order.orderCode %>')"
+                                class="text-red-600 font-bold text-sm hover:underline">Hủy đơn hàng này</button>
+                        </div>
+                        <% } %>
+                </aside>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        async function cancelOrder(code) {
+            const reason = prompt('Lý do hủy đơn hàng:');
+            if (reason === null) return;
+
+            try {
+                const res = await fetch(`/api/orders/my-orders/${code}/cancel`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Hủy đơn hàng thành công!');
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) { console.error(err); }
+        }
+    </script>

@@ -1,0 +1,125 @@
+<% layout('layouts/main') %>
+
+    <div class="container mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- SIDEBAR -->
+            <%- include('../../partials/admin-sidebar', { active: 'users' }) %>
+
+                <!-- MAIN CONTENT -->
+                <main class="flex-1">
+                    <div class="glass p-10 rounded-[3rem] shadow-xl">
+                        <div class="flex items-center justify-between mb-10">
+                            <h2 class="text-3xl font-black text-slate-900">Quản Lý Người Dùng</h2>
+                            <div class="bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                                <span class="text-sm font-bold text-blue-600">Tổng cộng: <%= users.length %> khách
+                                        hàng</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                                        <th class="pb-6 px-4">Người dùng</th>
+                                        <th class="pb-6 px-4">Liên hệ</th>
+                                        <th class="pb-6 px-4">Ngày đăng ký</th>
+                                        <th class="pb-6 px-4">Trạng thái</th>
+                                        <th class="pb-6 px-4 text-right">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    <% users.forEach(user=> { %>
+                                        <tr class="group hover:bg-slate-50/50 transition-colors">
+                                            <td class="py-6 px-4">
+                                                <div class="flex items-center gap-4">
+                                                    <div
+                                                        class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 overflow-hidden">
+                                                        <img src="<%= user.avatar %>" alt="avatar"
+                                                            class="w-full h-full object-cover">
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-bold text-slate-900">
+                                                            <%= user.lastName %>
+                                                                <%= user.firstName %>
+                                                        </p>
+                                                        <span
+                                                            class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-500 font-black uppercase tracking-widest">
+                                                            <%= user.role %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-6 px-4">
+                                                <p class="text-sm text-slate-600 font-medium">
+                                                    <%= user.email %>
+                                                </p>
+                                                <p class="text-[11px] text-slate-400">
+                                                    <%= user.phone || 'Chưa cập nhật' %>
+                                                </p>
+                                            </td>
+                                            <td class="py-6 px-4">
+                                                <p class="text-xs text-slate-500 font-medium">
+                                                    <%= user.createdAt.toLocaleDateString('vi-VN') %>
+                                                </p>
+                                            </td>
+                                            <td class="py-6 px-4">
+                                                <span id="status-<%= user._id %>"
+                                                    class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest <%= user.isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' %>">
+                                                    <%= user.isActive ? 'Đang hoạt động' : 'Đã bị khóa' %>
+                                                </span>
+                                            </td>
+                                            <td class="py-6 px-4 text-right">
+                                                <% if (user.role !=='admin' ) { %>
+                                                    <button onclick="toggleUserStatus('<%= user._id %>')"
+                                                        class="toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all <%= user.isActive ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white' %>">
+                                                        <%= user.isActive ? 'Khóa tài khoản' : 'Mở khóa' %>
+                                                    </button>
+                                                    <% } %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script>
+        async function toggleUserStatus(id) {
+            try {
+                const res = await fetch(`/admin/nguoi-dung/${id}/toggle-status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+
+                    // Cập nhật giao diện tại chỗ
+                    const statusSpan = document.getElementById(`status-${id}`);
+                    const btn = event.currentTarget;
+
+                    if (result.isActive) {
+                        statusSpan.innerText = 'Đang hoạt động';
+                        statusSpan.className = 'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600';
+                        btn.innerText = 'Khóa tài khoản';
+                        btn.className = 'toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-red-50 text-red-600 hover:bg-red-500 hover:text-white';
+                    } else {
+                        statusSpan.innerText = 'Đã bị khóa';
+                        statusSpan.className = 'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600';
+                        btn.innerText = 'Mở khóa';
+                        btn.className = 'toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white';
+                    }
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối máy chủ!', 'error');
+            }
+        }
+    </script>

@@ -1,0 +1,240 @@
+<% layout('layouts/main') %>
+    <div class="space-y-20">
+
+        <!-- HERO SECTION: ULTRA PREMIUM -->
+        <section class="relative min-h-[85vh] flex items-center overflow-hidden bg-slate-950">
+            <!-- Background Animated Shapes -->
+            <div class="absolute inset-0 z-0">
+                <div
+                    class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse">
+                </div>
+                <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[140px] animate-pulse"
+                    style="animation-delay: 2s"></div>
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="max-w-4xl">
+                    <span
+                        class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wider text-blue-400 uppercase bg-blue-400/10 rounded-full border border-blue-400/20 animate-fade-in-up">
+                        THẾ GIỚI CÔNG NGHỆ ĐỈNH CAO
+                    </span>
+                    <h1 class="text-6xl md:text-8xl font-bold text-white mb-8 leading-[1.1] animate-fade-in-up"
+                        style="animation-delay: 0.1s">
+                        Nâng Tầm Trải Nghiệm <br>
+                        <span class="text-gradient">Gaming & Workstation</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed animate-fade-in-up"
+                        style="animation-delay: 0.2s">
+                        TechStore cung cấp các dòng Laptop, PC và linh kiện phần cứng mạnh mẽ nhất thị trường. Cam kết
+                        chính
+                        hãng, bảo hành tuyệt đối.
+                    </p>
+                    <div class="flex flex-wrap gap-5 animate-fade-in-up" style="animation-delay: 0.3s">
+                        <a href="/san-pham"
+                            class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transform hover:-translate-y-1">
+                            Mua Ngay
+                        </a>
+                        <a href="#featured"
+                            class="px-10 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl transition-all border border-white/10 backdrop-blur-sm">
+                            Xem Sản Phẩm 🔥
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Graphic: RTX GPU -->
+            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 pr-20 animate-fade-in-up"
+                style="animation-delay: 0.4s">
+                <div
+                    class="w-[500px] h-[500px] bg-gradient-to-br from-blue-500/20 to-transparent rounded-full flex items-center justify-center relative">
+                    <div
+                        class="absolute inset-0 border border-white/10 rounded-full animate-[spin_12s_linear_infinite]">
+                    </div>
+                    <div
+                        class="absolute inset-20 border border-white/5 rounded-full animate-[spin_10s_linear_infinite_reverse]">
+                    </div>
+                    <img src="https://pcpartpicker.com/static/forever/images/product/88863f631165ae6c6b3e70d4fddcb016.256p.jpg"
+                        alt="GPU" class="w-80 relative z-10 drop-shadow-[0_0_50px_rgba(59,130,246,0.5)]">
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES: TRUST & QUALITY -->
+        <section class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-3xl group hover:border-blue-500/30 transition-all">
+                    <div
+                        class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        🛡️</div>
+                    <h3 class="text-xl font-bold mb-3">Chính Hãng 100%</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">TechStore cam kết mọi sản phẩm bán ra đều đầy đủ
+                        hóa
+                        đơn, chứng từ CO/CQ từ nhà sản xuất.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl group hover:border-blue-500/30 transition-all">
+                    <div
+                        class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        ⚡</div>
+                    <h3 class="text-xl font-bold mb-3">Lắp Đặt Thần Tốc</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Hỗ trợ lắp đặt PC và giao hàng nội thành siêu tốc
+                        trong vòng 2h làm việc.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl group hover:border-blue-500/30 transition-all">
+                    <div
+                        class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        🎧</div>
+                    <h3 class="text-xl font-bold mb-3">Hỗ Trợ 24/7</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Đội ngũ kỹ thuật chuyên nghiệp luôn sẵn sàng giải
+                        đáp
+                        mọi thắc mắc của khách hàng.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORIES: SMART SELECTION -->
+        <section class="container mx-auto px-6 py-10">
+            <div class="flex items-end justify-between mb-10">
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">Build Bộ Máy <span class="text-blue-600">Đỉnh Cao</span></h2>
+                    <p class="text-slate-500">Lựa chọn linh kiện chuẩn xác nhất cho nhu cầu của bạn</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                <% const cats=[ { name: 'Laptop' , slug: 'laptop' , icon: '💻' , color: 'bg-blue-50 text-blue-600' }, {
+                    name: 'CPU' , slug: 'cpu' , icon: '🧠' , color: 'bg-indigo-50 text-indigo-600' }, {
+                    name: 'VGA / GPU' , slug: 'gpu' , icon: '🎮' , color: 'bg-emerald-50 text-emerald-600' }, {
+                    name: 'RAM' , slug: 'ram' , icon: '📊' , color: 'bg-orange-50 text-orange-600' }, {
+                    name: 'SSD / HDD' , slug: 'storage' , icon: '💾' , color: 'bg-rose-50 text-rose-600' }, {
+                    name: 'Monitor' , slug: 'monitor' , icon: '🖥️' , color: 'bg-cyan-50 text-cyan-600' }, ]; %>
+                    <% cats.forEach(c=> { %>
+                        <a href="/san-pham?category=<%= c.slug %>" class="group">
+                            <div
+                                class="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm transition-all group-hover:shadow-xl group-hover:shadow-blue-500/10 group-hover:-translate-y-2 group-hover:border-blue-200 text-center">
+                                <div
+                                    class="w-20 h-20 mx-auto rounded-3xl <%= c.color %> flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition-transform">
+                                    <%= c.icon %>
+                                </div>
+                                <span class="font-bold text-slate-800">
+                                    <%= c.name %>
+                                </span>
+                            </div>
+                        </a>
+                        <% }) %>
+            </div>
+        </section>
+
+        <!-- FEATURED PRODUCTS -->
+        <section id="featured" class="container mx-auto px-6 py-10">
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-4xl font-bold">Thịnh Hành Nhất 🔥</h2>
+                <a href="/san-pham"
+                    class="px-6 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition-colors">Xem
+                    Tất Cả →</a>
+            </div>
+            <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Loading Skeleton -->
+                <% for(let i=0; i<4; i++) { %>
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 animate-pulse">
+                        <div class="w-full h-52 bg-slate-100 rounded-2xl mb-6"></div>
+                        <div class="h-4 bg-slate-100 rounded-full w-2/3 mb-3"></div>
+                        <div class="h-4 bg-slate-100 rounded-full w-full mb-6"></div>
+                        <div class="flex justify-between items-center">
+                            <div class="h-6 bg-slate-100 rounded-full w-1/3"></div>
+                            <div class="w-10 h-10 bg-slate-100 rounded-xl"></div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </section>
+
+        <!-- NEWSLETTER -->
+        <section class="container mx-auto px-6 pb-20">
+            <div class="p-10 md:p-20 rounded-[3rem] bg-slate-900 overflow-hidden relative">
+                <div class="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 blur-[80px]"></div>
+                <div class="relative z-10 max-w-xl">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">Nhận ưu đãi <br> <span
+                            class="text-blue-500">độc quyền</span> từ TechStore</h2>
+                    <p class="text-slate-400 mb-8">Đăng ký để nhận thông báo về các hot deal và ưu đãi giảm giá linh
+                        kiện
+                        sớm nhất.</p>
+                    <form class="flex flex-col sm:flex-row gap-4">
+                        <input type="email" placeholder="Địa chỉ email của bạn"
+                            class="flex-1 px-8 py-5 rounded-3xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <button
+                            class="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-3xl transition-all">Đăng
+                            Ký</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        async function loadFeatured() {
+            try {
+                const res = await fetch('/api/products/featured');
+                const json = await res.json();
+                if (!json.success) return;
+
+                const container = document.getElementById('featured-products');
+                container.innerHTML = json.data.products.map(p => `
+        <article class="product-card group bg-white rounded-3xl p-6 border border-slate-100 shadow-sm relative flex flex-col h-full">
+          <div class="absolute top-5 right-5 z-20">
+            <button class="w-10 h-10 rounded-xl bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-400 hover:text-red-500 transition-colors">❤️</button>
+          </div>
+          
+          <a href="/san-pham/${p.slug}" class="block mb-6 overflow-hidden rounded-2xl bg-slate-50 p-4">
+            <img src="${p.thumbnail}" alt="${p.name}" class="w-full h-48 object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500">
+          </a>
+
+          <div class="flex-grow">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">${p.brand}</span>
+              ${p.isNewArrival ? '<span class="px-2 py-0.5 rounded-md badge-new text-[10px] font-bold text-white uppercase tracking-wider">MỚI</span>' : ''}
+            </div>
+            <h3 class="font-bold text-slate-900 leading-snug mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3rem]">
+              <a href="/san-pham/${p.slug}">${p.name}</a>
+            </h3>
+            
+            <div class="flex items-center gap-2 mb-4">
+               <div class="flex text-yellow-400 text-xs">
+                  ${'★'.repeat(Math.round(p.rating || 0))}${'☆'.repeat(5 - Math.round(p.rating || 0))}
+               </div>
+               <span class="text-slate-400 text-[11px]">(${p.numReviews || 0} nhận xét)</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-slate-50 mt-auto">
+            <div>
+              <p class="text-blue-600 font-extrabold text-xl font-heading">${(p.salePrice || p.price).toLocaleString('vi-VN')}đ</p>
+              ${p.salePrice ? `<p class="text-slate-400 line-through text-xs font-medium">${p.price.toLocaleString('vi-VN')}đ</p>` : ''}
+            </div>
+            <button onclick="addToCart('${p._id}')" class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center hover:bg-blue-600 transition-all shadow-md active:scale-95">
+               🛒
+            </button>
+          </div>
+        </article>
+      `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function addToCart(id) {
+            try {
+                const res = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: id, quantity: 1 })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Đã thêm vào giỏ hàng! ⚡', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'Vui lòng đăng nhập!', 'error');
+                }
+            } catch (err) { showToast('Lỗi thêm sản phẩm', 'error'); }
+        }
+
+        loadFeatured();
+    </script>

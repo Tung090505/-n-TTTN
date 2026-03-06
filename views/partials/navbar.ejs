@@ -1,0 +1,133 @@
+<nav class="sticky top-0 z-[100] glass border-b border-white/20">
+    <div class="container mx-auto px-6">
+        <div class="flex items-center justify-between h-20">
+
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2 group">
+                <div
+                    class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-blue-500/20 group-hover:rotate-12 transition-transform">
+                    ⚡
+                </div>
+                <span class="text-2xl font-black tracking-tighter text-slate-900">TECH<span
+                        class="text-blue-600">STORE</span></span>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md mx-10">
+                <form action="/san-pham" method="GET" class="w-full relative group">
+                    <input type="text" name="search" placeholder="Tìm laptop, linh kiện..."
+                        class="w-full bg-slate-100/50 border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all outline-none text-sm">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        🔍
+                    </div>
+                </form>
+            </div>
+
+            <!-- Links & User -->
+            <div class="flex items-center gap-6">
+                <a href="/san-pham"
+                    class="hidden lg:block text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Sản
+                    phẩm</a>
+
+                <div class="h-6 w-px bg-slate-200 hidden lg:block"></div>
+
+                <% if (user) { %>
+                    <!-- Cart Icon -->
+                    <a href="/gio-hang" class="relative group">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xl group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                            🛒
+                        </div>
+                        <span id="cart-count"
+                            class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">0</span>
+                    </a>
+
+                    <!-- User Menu -->
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-3 p-1.5 rounded-2xl hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200">
+                            <div
+                                class="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                                <%= user.firstName.charAt(0) %>
+                            </div>
+                            <span class="hidden sm:block text-sm font-bold text-slate-700">
+                                <%= user.firstName %>
+                            </span>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50">
+                            <% if (user.role==='admin' ) { %>
+                                <a href="/admin/dashboard"
+                                    class="block px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 font-bold transition-colors">📊
+                                    Dashboard Admin</a>
+                                <% } %>
+                                    <a href="/tai-khoan/don-hang"
+                                        class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 font-medium transition-colors">📦
+                                        Đơn hàng</a>
+                                    <a href="/tai-khoan"
+                                        class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 font-medium transition-colors">👤
+                                        Hồ sơ</a>
+                                    <div class="h-px bg-slate-100 mx-2 my-1"></div>
+                                    <button onclick="logout()"
+                                        class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors">🚪
+                                        Đăng xuất</button>
+                        </div>
+                    </div>
+                    <% } else { %>
+                        <div class="flex items-center gap-3">
+                            <a href="/dang-nhap"
+                                class="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Đăng
+                                nhập</a>
+                            <a href="/dang-ky"
+                                class="px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-blue-600 transition-all shadow-md active:scale-95">Tham
+                                gia</a>
+                        </div>
+                        <% } %>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash Messages -->
+<% if (success) { %>
+    <div class="fixed top-24 right-6 z-[110] animate-fade-in-up">
+        <div
+            class="bg-emerald-500 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 border border-emerald-400/20">
+            <span class="text-xl">✅</span>
+            <span class="font-bold">
+                <%= success %>
+            </span>
+        </div>
+    </div>
+    <% } %>
+        <% if (error) { %>
+            <div class="fixed top-24 right-6 z-[110] animate-fade-in-up">
+                <div
+                    class="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 border border-red-400/20">
+                    <span class="text-xl">❌</span>
+                    <span class="font-bold">
+                        <%= error %>
+                    </span>
+                </div>
+            </div>
+            <% } %>
+
+                <script>
+                    async function logout() {
+                        await fetch('/api/auth/logout', { method: 'POST' });
+                        window.location.href = '/dang-nhap';
+                    }
+
+                    async function loadCartCount() {
+                        try {
+                            const res = await fetch('/api/cart');
+                            const data = await res.json();
+                            if (data.success) {
+                                document.getElementById('cart-count').innerText = data.data.cart.totalItems;
+                            }
+                        } catch (err) { }
+                    }
+  <% if (user) { %> loadCartCount(); <% } %>
+                </script>

@@ -1,0 +1,105 @@
+<% layout('layouts/main') %>
+
+    <div class="container mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <!-- SIDEBAR -->
+            <%- include('../../partials/admin-sidebar', { active: 'orders' }) %>
+
+                <!-- MAIN CONTENT -->
+                <main class="flex-1">
+                    <div class="glass p-10 rounded-[3rem] shadow-xl">
+                        <h2 class="text-3xl font-black text-slate-900 mb-10">Quản Lý Đơn Hàng</h2>
+
+                        <div class="space-y-6">
+                            <% orders.forEach(order=> { %>
+                                <div
+                                    class="p-8 rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-all bg-slate-50/50">
+                                    <div
+                                        class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6 pb-6 border-b border-white/50">
+                                        <div>
+                                            <div class="flex items-center gap-4 mb-2">
+                                                <span class="text-sm font-black text-slate-900 tracking-tighter">#<%=
+                                                        order.orderCode %></span>
+                                                <% let statusClass='bg-yellow-100 text-yellow-600' ;
+                                                    if(order.orderStatus==='delivered' )
+                                                    statusClass='bg-emerald-100 text-emerald-600' ;
+                                                    if(order.orderStatus==='cancelled' )
+                                                    statusClass='bg-red-100 text-red-600' ; %>
+                                                    <span
+                                                        class="px-3 py-1 rounded-lg <%= statusClass %> text-[10px] font-black uppercase tracking-widest">
+                                                        <%= order.orderStatus %>
+                                                    </span>
+                                            </div>
+                                            <p class="text-xs text-slate-500 font-medium">Khách hàng: <span
+                                                    class="font-bold text-slate-900">
+                                                    <%= order.user?.lastName %>
+                                                        <%= order.user?.firstName %>
+                                                </span> • <%= order.user?.email %>
+                                            </p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+                                                Tổng
+                                                thanh toán</p>
+                                            <p class="text-2xl font-black text-blue-600">
+                                                <%= order.totalAmount.toLocaleString('vi-VN') %>đ
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <p class="text-xs font-bold text-slate-500">Thanh toán: <span
+                                                    class="uppercase text-slate-900">
+                                                    <%= order.paymentMethod %>
+                                                </span></p>
+                                            <span
+                                                class="px-2 py-0.5 rounded bg-white text-[9px] font-black border border-slate-200">
+                                                <%= order.paymentStatus %>
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <select onchange="updateStatus('<%= order.orderCode %>', this.value)"
+                                                class="text-xs font-bold px-4 py-2 rounded-xl bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="pending" <%=order.orderStatus==='pending' ? 'selected'
+                                                    : '' %>>Chờ xử lý</option>
+                                                <option value="confirmed" <%=order.orderStatus==='confirmed'
+                                                    ? 'selected' : '' %>>Đã xác nhận</option>
+                                                <option value="delivering" <%=order.orderStatus==='delivering'
+                                                    ? 'selected' : '' %>>Đang giao</option>
+                                                <option value="delivered" <%=order.orderStatus==='delivered'
+                                                    ? 'selected' : '' %>>Đã giao xong</option>
+                                                <option value="cancelled" <%=order.orderStatus==='cancelled'
+                                                    ? 'selected' : '' %>>Đã hủy</option>
+                                            </select>
+                                            <a href="/tai-khoan/don-hang/<%= order.orderCode %>"
+                                                class="px-5 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl transition-all hover:bg-slate-800">Chi
+                                                tiết</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script>
+        async function updateStatus(code, status) {
+            try {
+                const res = await fetch(`/api/orders/admin/${code}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, note: 'Admin cập nhật trạng thái' })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Cập nhật thành công! ✨', 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (err) { showToast('Lỗi cập nhật đơn hàng', 'error'); }
+        }
+    </script>

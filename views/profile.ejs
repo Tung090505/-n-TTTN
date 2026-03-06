@@ -1,0 +1,101 @@
+<% layout('layouts/main') %>
+    <div class="container mx-auto px-6 py-10">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+            <!-- Sidebar -->
+            <aside class="w-full lg:w-64 space-y-4">
+                <div class="glass p-8 rounded-[2rem] text-center mb-6">
+                    <div
+                        class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[1.5rem] flex items-center justify-center text-white text-3xl font-black mb-4">
+                        <%= user.firstName.charAt(0) %>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">
+                        <%= user.lastName %>
+                            <%= user.firstName %>
+                    </h2>
+                    <p class="text-xs text-slate-400 font-medium uppercase tracking-widest mt-1">
+                        <%= user.role %>
+                    </p>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="/tai-khoan/don-hang"
+                        class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all border border-slate-100">
+                        <span>📦</span> Đơn hàng của tôi
+                    </a>
+                    <a href="/tai-khoan"
+                        class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold transition-all shadow-lg shadow-blue-500/20">
+                        <span>👤</span> Thông tin cá nhân
+                    </a>
+                    <a href="/gio-hang"
+                        class="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 font-bold transition-all border border-slate-100">
+                        <span>🛒</span> Giỏ hàng hiện tại
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <div class="glass p-10 rounded-[3rem] shadow-xl">
+                    <h2 class="text-3xl font-black mb-8">Thông Tin Của Tôi</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Họ và
+                                    tên
+                                </p>
+                                <p class="text-lg font-bold text-slate-800">
+                                    <%= user.lastName %>
+                                        <%= user.firstName %>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Email
+                                    liên
+                                    lạc</p>
+                                <p class="text-lg font-bold text-slate-800">
+                                    <%= user.email %>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Ngày gia
+                                    nhập</p>
+                                <p class="text-lg font-bold text-slate-800">
+                                    <%= new Date(user.createdAt).toLocaleDateString('vi-VN') %>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
+                            <h3 class="font-bold text-slate-900 mb-4">Địa chỉ giao hàng mặc định</h3>
+                            <% if (user.addresses && user.addresses.length> 0) { %>
+                                <% const addr=user.addresses[0]; %>
+                                    <p class="text-sm text-slate-600 leading-relaxed">
+                                        <%= addr.street %>, <%= addr.ward %>,<br>
+                                                <%= addr.district %>, <%= addr.city %><br>
+                                                        SĐT: <span class="font-bold text-slate-900">
+                                                            <%= addr.phone %>
+                                                        </span>
+                                    </p>
+                                    <% } else { %>
+                                        <p class="text-sm text-slate-400 italic">Chưa có địa chỉ nào được lưu.</p>
+                                        <button class="mt-4 text-blue-600 font-bold text-sm hover:underline">+ Thêm địa
+                                            chỉ
+                                            mới</button>
+                                        <% } %>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 pt-10 border-t border-slate-100 flex flex-wrap gap-4">
+                        <button
+                            class="px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all">Cập
+                            nhật thông tin</button>
+                        <button
+                            class="px-8 py-4 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all">Đổi
+                            mật khẩu</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>

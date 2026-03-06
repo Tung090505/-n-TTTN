@@ -1,0 +1,123 @@
+<% layout('layouts/main') %>
+    <div class="min-h-[85vh] flex items-center justify-center py-12 px-6">
+        <div class="w-full max-w-xl">
+            <div class="glass p-10 md:p-14 rounded-[3rem] shadow-2xl border border-white/40">
+
+                <div class="text-center mb-10">
+                    <h1 class="text-4xl font-black text-slate-900 mb-2">Tạo tài khoản 🚀</h1>
+                    <p class="text-slate-500">Gia nhập cộng đồng TechStore để nhận ưu đãi tốt nhất.</p>
+                </div>
+
+                <!-- Global Error Message -->
+                <div id="global-error"
+                    class="hidden mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-start gap-3 text-left">
+                    <span class="text-red-500 mt-0.5">⚠️</span>
+                    <p class="text-sm text-red-600 font-bold leading-tight" id="global-error-msg"></p>
+                </div>
+
+                <form action="/api/auth/register" method="POST" id="register-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Họ</label>
+                            <input type="text" name="lastName" required placeholder="Nguyễn"
+                                class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all input-focus">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Tên</label>
+                            <input type="text" name="firstName" required placeholder="Văn A"
+                                class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all input-focus">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Email</label>
+                        <input type="email" name="email" required placeholder="name@example.com"
+                            class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all input-focus">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Mật khẩu</label>
+                            <input type="password" name="password" required placeholder="••••••••"
+                                class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all input-focus text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Nhập lại mật khẩu</label>
+                            <input type="password" name="confirmPassword" required placeholder="••••••••"
+                                class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all input-focus text-sm">
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 ml-1">
+                        <input type="checkbox" required id="terms"
+                            class="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <label for="terms" class="text-sm text-slate-600 leading-tight">Tôi đồng ý với các <a href="#"
+                                class="text-blue-600 hover:underline">Điều khoản dịch vụ</a> và <a href="#"
+                                class="text-blue-600 hover:underline">Chính sách bảo mật</a>.</label>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95">
+                        Đăng Ký Tài Khoản
+                    </button>
+                </form>
+
+                <div class="mt-10 pt-10 border-t border-slate-200 text-center">
+                    <p class="text-slate-500">Đã có tài khoản?
+                        <a href="/dang-nhap" class="text-blue-600 font-bold hover:underline">Đăng nhập ngay</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            if (data.password !== data.confirmPassword) {
+                const errorBanner = document.getElementById('global-error');
+                const errorMsg = document.getElementById('global-error-msg');
+                errorMsg.innerText = 'Mật khẩu nhập lại không khớp!';
+                errorBanner.classList.remove('hidden');
+                return;
+            }
+
+            // Reset styles and messages
+            document.getElementById('global-error').classList.add('hidden');
+            document.querySelectorAll('.input-error-msg').forEach(el => el.remove());
+            document.querySelectorAll('.input-focus').forEach(el => el.classList.remove('border-red-500', 'ring-red-500/20'));
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    window.location.href = '/dang-nhap?registered=true';
+                } else {
+                    if (result.errors) {
+                        result.errors.forEach(err => {
+                            const input = document.querySelector(`[name="${err.field}"]`);
+                            if (input) {
+                                input.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+                                const errorDiv = document.createElement('p');
+                                errorDiv.className = 'text-[10px] text-red-500 font-bold mt-1 ml-1 input-error-msg';
+                                errorDiv.innerText = '× ' + err.message;
+                                input.parentNode.appendChild(errorDiv);
+                            }
+                        });
+                    } else {
+                        showToast(result.message || 'Lỗi đăng ký tài khoản', 'error');
+                    }
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối máy chủ! Vui lòng thử lại.', 'error');
+            }
+        });
+    </script>

@@ -1,0 +1,37 @@
+<aside class="w-full lg:w-72 space-y-4">
+    <div class="glass p-8 rounded-[2rem] text-center mb-6">
+        <div
+            class="w-20 h-20 mx-auto bg-gradient-to-br from-slate-800 to-black rounded-[1.5rem] flex items-center justify-center text-white text-3xl mb-4 shadow-xl">
+            👑
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 line-clamp-1">Admin Panel</h2>
+        <p class="text-[10px] font-black uppercase tracking-[3px] text-slate-400 mt-2">Quản trị hệ thống</p>
+    </div>
+
+    <nav class="space-y-2">
+        <a href="/admin/dashboard"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'dashboard' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">📊 Dashboard</span>
+            <% if(active==='dashboard' ) { %> <span class="text-xs opacity-50">→</span>
+                <% } %>
+        </a>
+        <a href="/admin/san-pham"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'products' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">📦 Quản lý Sản phẩm</span>
+            <% if(active==='products' ) { %> <span class="text-xs opacity-50">→</span>
+                <% } %>
+        </a>
+        <a href="/admin/don-hang"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'orders' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">📜 Quản lý Đơn hàng</span>
+            <% if(active==='orders' ) { %> <span class="text-xs opacity-50">→</span>
+                <% } %>
+        </a>
+        <a href="/admin/nguoi-dung"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'users' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">👥 Quản lý Người dùng</span>
+            <% if(active==='users' ) { %> <span class="text-xs opacity-50">→</span>
+                <% } %>
+        </a>
+    </nav>
+</aside>

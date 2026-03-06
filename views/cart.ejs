@@ -1,0 +1,131 @@
+<% layout('layouts/main') %>
+    <div class="container mx-auto px-6 py-10">
+        <h1 class="text-4xl font-black text-slate-900 mb-10 text-center md:text-left">📦 Giỏ Hàng Của Bạn</h1>
+
+        <% if (!cart || cart.items.length===0) { %>
+            <div class="glass p-20 rounded-[3rem] text-center max-w-2xl mx-auto shadow-2xl">
+                <div class="text-8xl mb-6">🛒</div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Giỏ hàng của bạn đang trống!</h2>
+                <p class="text-slate-500 mb-10">Hãy lấp đầy nó bằng những linh kiện mạnh mẽ nhất ngay bây giờ.</p>
+                <a href="/san-pham"
+                    class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-500/20">Khám
+                    Phá Sản Phẩm</a>
+            </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                    <!-- List Items -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <% cart.items.forEach(item=> { %>
+                            <div
+                                class="glass p-6 rounded-[2rem] flex flex-col md:flex-row items-center gap-6 group hover:border-blue-200 transition-all">
+                                <div class="w-32 h-32 bg-slate-50 rounded-2xl p-4 shrink-0 overflow-hidden">
+                                    <img src="<%= item.product.thumbnail %>" alt="<%= item.product.name %>"
+                                        class="w-full h-full object-contain group-hover:scale-110 transition-transform">
+                                </div>
+
+                                <div class="flex-grow space-y-1">
+                                    <span class="text-[10px] font-black uppercase text-blue-500 tracking-widest">
+                                        <%= item.product.brand %>
+                                    </span>
+                                    <h3 class="text-lg font-bold text-slate-900 leading-tight">
+                                        <a href="/san-pham/<%= item.product.slug %>"
+                                            class="hover:text-blue-600 transition-colors">
+                                            <%= item.product.name %>
+                                        </a>
+                                    </h3>
+                                    <p class="text-slate-400 text-sm font-medium">Đơn giá: <span class="text-slate-700">
+                                            <%= (item.product.salePrice || item.product.price).toLocaleString('vi-VN')
+                                                %>đ
+                                        </span></p>
+                                </div>
+
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center bg-slate-100 rounded-xl p-1">
+                                        <button onclick="updateQty('<%= item.product._id %>', -1)"
+                                            class="w-8 h-8 rounded-lg hover:bg-white transition-colors font-bold">-</button>
+                                        <span class="w-10 text-center font-black text-sm">
+                                            <%= item.quantity %>
+                                        </span>
+                                        <button onclick="updateQty('<%= item.product._id %>', 1)"
+                                            class="w-8 h-8 rounded-lg hover:bg-white transition-colors font-bold">+</button>
+                                    </div>
+                                    <div class="text-right min-w-[120px]">
+                                        <p class="text-lg font-black text-slate-900">
+                                            <%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ
+                                        </p>
+                                    </div>
+                                    <button onclick="removeItem('<%= item.product._id %>')"
+                                        class="text-slate-300 hover:text-red-500 transition-colors p-2">✕</button>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="lg:col-span-4">
+                        <div class="glass p-8 rounded-[3rem] sticky top-28 shadow-xl">
+                            <h2 class="text-2xl font-bold mb-8">Tổng Đơn Hàng</h2>
+
+                            <div class="space-y-4 mb-8">
+                                <div class="flex justify-between text-slate-500 font-medium">
+                                    <span>Tạm tính</span>
+                                    <span class="text-slate-900">
+                                        <%= cart.totalAmount.toLocaleString('vi-VN') %>đ
+                                    </span>
+                                </div>
+                                <div class="flex justify-between text-slate-500 font-medium">
+                                    <span>Vận chuyển</span>
+                                    <span class="text-emerald-500 font-bold">Miễn phí ⚡</span>
+                                </div>
+                                <div class="h-px bg-slate-100 my-4"></div>
+                                <div class="flex justify-between items-end">
+                                    <span class="font-bold text-slate-600">Tổng tiền</span>
+                                    <span class="text-3xl font-black text-blue-600">
+                                        <%= cart.totalAmount.toLocaleString('vi-VN') %>đ
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="/thanh-toan"
+                                class="w-full py-5 bg-slate-900 hover:bg-blue-600 text-white font-black rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 group">
+                                Thanh Toán Ngay
+                                <span class="group-hover:translate-x-1 transition-transform">→</span>
+                            </a>
+
+                            <div class="mt-8 flex items-center justify-center gap-4 opacity-50">
+                                <img src="https://vcdn.tikicdn.com/ts/upload/d6/9e/1f/ff2940263f3366db7e6e5f80b8b92b61.png"
+                                    class="h-6">
+                                <img src="https://img.vietnamfinance.vn/upload/news/lehoang/2021/4/22/vnpay-qr.jpg"
+                                    class="h-4">
+                                <img src="https://static.mservice.io/img/logo-momo.png" class="h-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+    </div>
+
+    <script>
+        async function updateQty(id, amt) {
+            try {
+                const res = await fetch('/api/cart/update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: id, quantityChange: amt })
+                });
+                const data = await res.json();
+                if (data.success) window.location.reload();
+                else showToast(data.message, 'error');
+            } catch (err) { showToast('Lỗi cập nhật giỏ hàng', 'error'); }
+        }
+
+        async function removeItem(id) {
+            if (!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) return;
+            try {
+                const res = await fetch('/api/cart/' + id, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) window.location.reload();
+            } catch (err) { console.error(err); }
+        }
+    </script>
