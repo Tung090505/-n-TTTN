@@ -109,8 +109,10 @@ const ProductSchema = new mongoose.Schema({
         min: [0, 'Giá khuyến mãi không được âm'],
         validate: {
             validator: function (val) {
+                // Nếu không có giá khuyến mãi hoặc giá khuyến mãi là null thì bỏ qua
+                if (val === null || val === undefined) return true;
                 // Giá khuyến mãi phải nhỏ hơn giá gốc
-                return val === null || val < this.price;
+                return val < this.price;
             },
             message: 'Giá khuyến mãi phải nhỏ hơn giá gốc',
         },
@@ -315,8 +317,10 @@ ProductSchema.pre('save', function (next) {
     }
 
     // Tính phần trăm giảm giá tự động
-    if (this.salePrice && this.price) {
+    if (this.salePrice && this.price && this.salePrice < this.price) {
         this.discountPercent = Math.round(((this.price - this.salePrice) / this.price) * 100);
+    } else {
+        this.discountPercent = 0;
     }
 
     next();

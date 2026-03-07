@@ -90,6 +90,11 @@ exports.createProduct = async (req, res, next) => {
         // Gắn admin tạo sản phẩm
         req.body.createdBy = req.user.id;
 
+        // Nếu có file ảnh được upload từ Cloudinary
+        if (req.file) {
+            req.body.thumbnail = req.file.path;
+        }
+
         const product = await Product.create(req.body);
 
         res.status(201).json({
@@ -114,15 +119,16 @@ exports.updateProduct = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
-        // Cập nhật sản phẩm
-        product = await Product.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            {
-                new: true,  // Trả về document sau khi cập nhật
-                runValidators: true,  // Chạy validation
-            }
-        );
+        // Nếu có file ảnh mới được upload
+        if (req.file) {
+            req.body.thumbnail = req.file.path;
+        }
+
+        // Cập nhật các trường thông tin từ req.body
+        Object.assign(product, req.body);
+
+        // Lưu sản phẩm (hành động này sẽ kích hoạt validator và middleware .pre('save'))
+        product = await product.save();
 
         res.status(200).json({
             success: true,

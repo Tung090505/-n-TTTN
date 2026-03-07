@@ -10,6 +10,7 @@ const router = express.Router();
 const productController = require('../controllers/productController');
 const { protect, adminOnly } = require('../middleware/auth');
 const { validateProduct, validateProductQuery } = require('../middleware/validate');
+const { uploadCloud } = require('../config/cloudinary');
 
 // --- Public Routes ---
 router.get('/', validateProductQuery, productController.getProducts);      // Danh sách + bộ lọc
@@ -21,8 +22,8 @@ router.get('/:slug', productController.getProduct);         // Chi tiết 1 SP
 router.post('/:id/reviews', protect, productController.addReview); // Đánh giá
 
 // --- Admin Routes ---
-router.post('/', ...adminOnly, validateProduct, productController.createProduct); // Tạo SP
-router.put('/:id', ...adminOnly, validateProduct, productController.updateProduct); // Cập nhật
+router.post('/', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.createProduct); // Tạo SP
+router.put('/:id', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.updateProduct); // Cập nhật
 router.delete('/:id', ...adminOnly, productController.deleteProduct); // Xóa
 
 module.exports = router;

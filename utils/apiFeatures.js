@@ -43,7 +43,7 @@ class ApiFeatures {
     filter() {
         // Sao chép query string và loại bỏ các trường đặc biệt
         const queryObj = { ...this.queryString };
-        const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minPrice', 'maxPrice'];
+        const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minPrice', 'maxPrice', 'price'];
         excludedFields.forEach(field => delete queryObj[field]);
 
         // Chuyển đổi operators: gte -> $gte, lte -> $lte...
@@ -52,52 +52,56 @@ class ApiFeatures {
 
         const filters = JSON.parse(queryStr);
 
-        // --- Lọc theo khoảng giá ---
-        // Ưu tiên dùng finalPrice (salePrice nếu có, ngược lại dùng price)
-        if (this.queryString.minPrice || this.queryString.maxPrice) {
-            const priceFilter = {};
-            if (this.queryString.minPrice) priceFilter.$gte = parseFloat(this.queryString.minPrice);
-            if (this.queryString.maxPrice) priceFilter.$lte = parseFloat(this.queryString.maxPrice);
+        // --- 1. Lọc theo khoảng giá (Lấy từ price[gte] và price[lte]) ---
+        // Ưu tiên dùng salePrice nếu có, ngược lại dùng price
+        const minPrice = this.queryString.price?.gte || this.queryString.minPrice;
+        const maxPrice = this.queryString.price?.lte || this.queryString.maxPrice;
 
-            // Lọc theo salePrice hoặc price
+        if (minPrice || maxPrice) {
+            const priceFilter = {};
+            if (minPrice) priceFilter.$gte = parseFloat(minPrice);
+            if (maxPrice) priceFilter.$lte = parseFloat(maxPrice);
+
+            // Logic: (salePrice thỏa mãn) HOẶC (không có salePrice VÀ price thỏa mãn)
             filters.$or = [
                 { salePrice: priceFilter },
                 { salePrice: null, price: priceFilter },
             ];
         }
 
-        // --- Luôn chỉ hiển thị sản phẩm đang active ---
-        filters.isActive = true;
+        // --- 2. Lọc theo thương hiệu (Xử lý cả mảng và chuỗi) ---
+        if (this.queryString.brand) {
+            let brands = this.queryString.brand;
+            if (typeof brands === 'string') {
+                brands = brands.split(',').map(b => b.trim());
+            }
 
-        // --- Lọc tồn kho (nếu yêu cầu) ---
-        if (this.queryString.inStock === 'true') {
-            filters.stock = { $gt: 0 };
+            if (Array.isArray(brands) && brands.length > 0) {
+                if (brands.length > 1) {
+                    filters.brand = { $in: brands };
+                } else {
+                    filters.brand = { $regex: new RegExp(brands[0], 'i') };
+                }
+            }
         }
 
-        // --- Lọc thông số kỹ thuật (specifications) ---
-        // URL: ?spec_cores=8&spec_socket=AM5
-        // -> Lọc specifications.cores = 8 và specifications.socket = 'AM5'
+        // --- 3. Lọc thông số kỹ thuật (specifications) ---
         Object.keys(this.queryString).forEach(key => {
             if (key.startsWith('spec_')) {
                 const specField = key.replace('spec_', '');
                 filters[`specifications.${specField}`] = this.queryString[key];
-                delete filters[key];
             }
         });
 
-        // --- Lọc theo thương hiệu (cho phép nhiều thương hiệu) ---
-        // URL: ?brand=Intel,AMD
-        if (this.queryString.brand) {
-            const brands = this.queryString.brand.split(',').map(b => b.trim());
-            if (brands.length > 1) {
-                filters.brand = { $in: brands };
-            } else {
-                filters.brand = { $regex: new RegExp(brands[0], 'i') }; // Case-insensitive
-            }
+        // --- 4. Trạng thái mặc định ---
+        filters.isActive = true;
+
+        if (this.queryString.inStock === 'true') {
+            filters.stock = { $gt: 0 };
         }
 
         this.query = this.query.find(filters);
-        return this; // Return this để chain methods
+        return this;
     }
 
     // ============================================

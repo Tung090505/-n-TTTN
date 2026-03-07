@@ -125,8 +125,14 @@ const validateProduct = [
         .isFloat({ min: 0 }).withMessage('Giá phải là số dương'),
 
     body('salePrice')
-        .optional({ nullable: true })
-        .isFloat({ min: 0 }).withMessage('Giá khuyến mãi phải là số dương'),
+        .optional({ nullable: true, checkFalsy: true })
+        .isFloat({ min: 0 }).withMessage('Giá khuyến mãi phải là số dương')
+        .custom((val, { req }) => {
+            if (val && Number(val) >= Number(req.body.price)) {
+                throw new Error('Giá khuyến mãi phải nhỏ hơn giá gốc');
+            }
+            return true;
+        }),
 
     body('stock')
         .notEmpty().withMessage('Tồn kho không được để trống')

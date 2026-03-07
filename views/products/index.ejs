@@ -26,10 +26,11 @@
                                     <% categories.forEach(cat=> { %>
                                         <label class="flex items-center gap-3 cursor-pointer group">
                                             <input type="radio" name="category" value="<%= cat %>"
+                                                onchange="this.form.submit()"
                                                 class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                                                 <%=query.category===cat ? 'checked' : '' %>>
                                             <span
-                                                class="text-sm text-slate-600 group-hover:text-blue-600 transition-colors uppercase">
+                                                class="text-sm <%= query.category === cat ? 'text-blue-600 font-bold' : 'text-slate-600' %> group-hover:text-blue-600 transition-colors uppercase">
                                                 <%= cat %>
                                             </span>
                                         </label>
@@ -46,12 +47,16 @@
                                 <% const brands=['ASUS', 'MSI' , 'Intel' , 'AMD' , 'Gigabyte' , 'Corsair' , 'Kingston' ]
                                     %>
                                     <% brands.forEach(brand=> { %>
-                                        <label
-                                            class="px-3 py-2 rounded-xl border border-slate-100 text-[11px] font-bold text-slate-500 cursor-pointer text-center hover:bg-blue-50 hover:border-blue-200 transition-all peer-checked:bg-blue-600 peer-checked:text-white">
-                                            <input type="checkbox" name="brand" value="<%= brand %>" class="hidden peer"
-                                                <%=query.brand && query.brand.includes(brand) ? 'checked' : '' %>>
-                                            <%= brand %>
-                                        </label>
+                                        <div class="relative">
+                                            <input type="checkbox" name="brand" value="<%= brand %>"
+                                                id="brand-<%= brand %>" onchange="this.form.submit()"
+                                                class="hidden peer" <%=(query.brand && (Array.isArray(query.brand) ?
+                                                query.brand.includes(brand) : query.brand===brand)) ? 'checked' : '' %>>
+                                            <label for="brand-<%= brand %>"
+                                                class="block px-3 py-2 rounded-xl border border-slate-100 text-[11px] font-bold text-slate-500 cursor-pointer text-center hover:bg-blue-50 hover:border-blue-200 transition-all peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:shadow-md peer-checked:shadow-blue-500/20">
+                                                <%= brand %>
+                                            </label>
+                                        </div>
                                         <% }) %>
                             </div>
                         </div>
@@ -60,27 +65,35 @@
 
                         <!-- Khoảng giá -->
                         <div>
-                            <h3 class="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Khoảng giá (VNĐ)
-                            </h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Khoảng giá (VNĐ)
+                                </h3>
+                                <% if (query.price?.gte || query.price?.lte) { %>
+                                    <button type="button" onclick="clearPrice()"
+                                        class="text-[10px] font-black text-red-500 hover:text-red-700 uppercase">Xóa</button>
+                                    <% } %>
+                            </div>
                             <div class="space-y-4">
                                 <div>
-                                    <label class="text-[10px] text-slate-400 font-bold uppercase">Từ</label>
+                                    <label
+                                        class="text-[10px] text-slate-400 font-bold uppercase mb-1 block ml-1">Từ</label>
                                     <input type="number" name="price[gte]" value="<%= query.price?.gte %>"
-                                        placeholder="0"
-                                        class="w-full px-4 py-2 rounded-xl bg-slate-50 border-none outline-none text-sm">
+                                        onchange="this.form.submit()" placeholder="0"
+                                        class="w-full px-5 py-3 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-sm font-bold text-slate-900">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] text-slate-400 font-bold uppercase">Đến</label>
+                                    <label
+                                        class="text-[10px] text-slate-400 font-bold uppercase mb-1 block ml-1">Đến</label>
                                     <input type="number" name="price[lte]" value="<%= query.price?.lte %>"
-                                        placeholder="99.000.000"
-                                        class="w-full px-4 py-2 rounded-xl bg-slate-50 border-none outline-none text-sm">
+                                        onchange="this.form.submit()" placeholder="99.000.000"
+                                        class="w-full px-5 py-3 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-sm font-bold text-slate-900">
                                 </div>
                             </div>
                         </div>
 
                         <button type="submit"
-                            class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all">
-                            Áp Dụng
+                            class="w-full py-4 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl shadow-slate-900/10 transition-all transform active:scale-95">
+                            ÁP DỤNG BỘ LỌC
                         </button>
                     </form>
                 </div>
@@ -210,5 +223,12 @@
                     alert(data.message || 'Lỗi! Vui lòng thử lại.');
                 }
             } catch (err) { console.error(err); }
+        }
+
+        function clearPrice() {
+            const form = document.getElementById('filter-form');
+            form['price[gte]'].value = '';
+            form['price[lte]'].value = '';
+            form.submit();
         }
     </script>
