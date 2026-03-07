@@ -114,17 +114,19 @@
 
                     <!-- Short Specs Quick View -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <% const quickSpecs=Object.entries(product.specifications || {}).slice(0, 4); %>
-                            <% quickSpecs.forEach(([key, val])=> { %>
-                                <div class="p-4 rounded-2xl bg-white border border-slate-100">
-                                    <p class="text-[10px] text-slate-400 uppercase font-black mb-1">
-                                        <%= key %>
-                                    </p>
-                                    <p class="text-sm font-bold text-slate-800 truncate">
-                                        <%= val %>
-                                    </p>
-                                </div>
-                                <% }) %>
+                        <% let specsObj=product.specifications || {}; if (typeof specsObj==='string' ) { try {
+                            specsObj=JSON.parse(specsObj); } catch(e) { specsObj={}; } } %>
+                            <% const quickSpecs=Object.entries(specsObj).slice(0, 4); %>
+                                <% quickSpecs.forEach(([key, val])=> { %>
+                                    <div class="p-4 rounded-2xl bg-white border border-slate-100">
+                                        <p class="text-[10px] text-slate-400 uppercase font-black mb-1">
+                                            <%= key %>
+                                        </p>
+                                        <p class="text-sm font-bold text-slate-800 truncate">
+                                            <%= typeof val==='object' ? JSON.stringify(val) : val %>
+                                        </p>
+                                    </div>
+                                    <% }) %>
                     </div>
 
                     <!-- Add to cart -->
@@ -166,16 +168,18 @@
             <div id="specs-tab" class="tab-pane">
                 <div class="glass p-10 rounded-[3rem]">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-6">
-                        <% Object.entries(product.specifications || {}).forEach(([key, val])=> { %>
-                            <div class="flex items-center justify-between py-4 border-b border-slate-100">
-                                <span class="text-slate-500 font-medium uppercase text-xs tracking-wider">
-                                    <%= key %>
-                                </span>
-                                <span class="text-slate-900 font-bold text-right ml-4">
-                                    <%= typeof val==='object' ? JSON.stringify(val) : val %>
-                                </span>
-                            </div>
-                            <% }) %>
+                        <% let fullSpecsObj=product.specifications || {}; if (typeof fullSpecsObj==='string' ) { try {
+                            fullSpecsObj=JSON.parse(fullSpecsObj); } catch(e) { fullSpecsObj={}; } } %>
+                            <% Object.entries(fullSpecsObj).forEach(([key, val])=> { %>
+                                <div class="flex items-center justify-between py-4 border-b border-slate-100">
+                                    <span class="text-slate-500 font-medium uppercase text-xs tracking-wider">
+                                        <%= key %>
+                                    </span>
+                                    <span class="text-slate-900 font-bold text-right ml-4">
+                                        <%= typeof val==='object' ? JSON.stringify(val) : val %>
+                                    </span>
+                                </div>
+                                <% }) %>
                     </div>
                 </div>
             </div>
