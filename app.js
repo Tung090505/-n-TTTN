@@ -49,6 +49,9 @@ connectDB();
 // ============================================
 const app = express();
 
+// Thiết lập tin tưởng Proxy (Cần thiết khi chạy trên Render, Heroku...)
+app.set('trust proxy', 1);
+
 // ============================================
 // CẤU HÌNH TEMPLATE ENGINE (EJS)
 // ============================================
@@ -94,7 +97,7 @@ app.use('/api/', limiter);
  */
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 phút
-    max: 10,                    // Tối đa 10 lần đăng nhập
+    max: 100,                    // Tăng lên 100 lần để tránh bị chặn nhầm trên Proxy
     message: {
         success: false,
         message: 'Quá nhiều lần đăng nhập thất bại. Vui lòng thử lại sau 15 phút!'
