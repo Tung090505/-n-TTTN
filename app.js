@@ -35,6 +35,7 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 // Import Error Handler
 const errorHandler = require('./middleware/errorHandler');
@@ -226,6 +227,7 @@ app.use('/api/products', productRoutes); // Quản lý sản phẩm
 app.use('/api/cart', cartRoutes);    // Giỏ hàng
 app.use('/api/orders', orderRoutes);   // Đơn hàng
 app.use('/admin', adminRoutes);   // Trang quản trị
+app.use('/', aiRoutes);          // AI Build PC
 
 
 // ============================================

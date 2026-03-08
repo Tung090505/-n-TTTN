@@ -1,0 +1,698 @@
+<% layout('layouts/main') %>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-16">
+        <div class="absolute inset-0 opacity-20">
+            <div
+                class="absolute top-10 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse">
+            </div>
+            <div class="absolute bottom-10 right-10 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
+                style="animation-delay: 2s"></div>
+            <div class="absolute top-1/2 left-1/2 w-60 h-60 bg-violet-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
+                style="animation-delay: 4s"></div>
+        </div>
+        <div class="relative container mx-auto px-6 text-center">
+            <div
+                class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/20">
+                <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span class="text-white/90 text-sm font-bold tracking-wide">AI-POWERED PC BUILDER</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-4 font-heading">
+                Xây Dựng Cấu Hình PC <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Thông Minh</span>
+            </h1>
+            <p class="text-lg text-blue-200/80 max-w-2xl mx-auto">
+                Mô tả nhu cầu của bạn, AI sẽ tự động chọn cấu hình phù hợp nhất từ kho sản phẩm của TechStore
+            </p>
+        </div>
+    </section>
+
+    <!-- Mode Tabs -->
+    <div class="container mx-auto px-6 -mt-8 relative z-10">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+
+            <!-- Tab Buttons -->
+            <div class="flex border-b border-slate-100">
+                <button id="tab-ai" onclick="switchMode('ai')"
+                    class="flex-1 py-5 px-8 text-center font-bold text-sm transition-all relative group active-tab">
+                    <div class="flex items-center justify-center gap-3">
+                        <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <div class="text-left">
+                            <span class="block text-slate-800">Cấu Hình Tự Động (AI Mode)</span>
+                            <span class="block text-xs text-slate-400 font-normal">Nhập nhu cầu → AI chọn sẵn</span>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 scale-x-100 transition-transform"
+                        id="tab-ai-indicator"></div>
+                </button>
+                <button id="tab-hybrid" onclick="switchMode('hybrid')"
+                    class="flex-1 py-5 px-8 text-center font-bold text-sm transition-all relative group">
+                    <div class="flex items-center justify-center gap-3">
+                        <svg class="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <div class="text-left">
+                            <span class="block text-slate-800">Tự Build PC (Hybrid Mode)</span>
+                            <span class="block text-xs text-slate-400 font-normal">Chọn linh kiện + AI tối ưu</span>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 scale-x-0 transition-transform"
+                        id="tab-hybrid-indicator"></div>
+                </button>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- AI MODE PANEL -->
+            <!-- ============================================ -->
+            <div id="panel-ai" class="p-8">
+                <div class="max-w-3xl mx-auto">
+                    <!-- Mô tả hướng dẫn -->
+                    <div
+                        class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8 border border-blue-100/50">
+                        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <span></span> Hướng dẫn
+                        </h3>
+                        <p class="text-sm text-slate-600 mb-3">Mô tả nhu cầu sử dụng máy tính của bạn, ví dụ:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Tôi cần PC gaming ngân sách 30 triệu, chơi game 4K"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "PC đồ họa thiết kế, render video Premiere, tầm 25 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Máy tính văn phòng bền, tiết kiệm, budget 10 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "PC lập trình, chạy Docker, VS Code, ngân sách 20 triệu"
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Form nhập mô tả -->
+                    <div class="relative">
+                        <textarea id="ai-description"
+                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 pr-14 text-base focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"
+                            rows="4" placeholder="Mô tả nhu cầu sử dụng PC của bạn..."></textarea>
+                        <div class="absolute bottom-4 right-4 text-xs text-slate-400">
+                            <span id="char-count">0</span>/500
+                        </div>
+                    </div>
+
+                    <!-- Nút sinh cấu hình -->
+                    <button id="btn-ai-build" onclick="aiGenerateConfig()"
+                        class="w-full mt-5 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.98] flex items-center justify-center gap-3 text-base">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Tạo cấu hình AI</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- HYBRID MODE PANEL -->
+            <!-- ============================================ -->
+            <div id="panel-hybrid" class="p-8 hidden">
+                <div class="max-w-4xl mx-auto">
+
+                    <!-- Cấu hình chung -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Mục đích sử dụng -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2"> Mục đích sử dụng</label>
+                            <select id="hybrid-purpose"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                                <% Object.entries(purposes).forEach(([key, val])=> { %>
+                                    <option value="<%= key %>">
+                                        <%= val.label %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <!-- Ngân sách -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2"> Tổng ngân sách (VNĐ)</label>
+                            <input type="number" id="hybrid-budget" value="20000000" min="5000000" step="1000000"
+                                class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm font-medium">
+                            <p class="text-xs text-slate-400 mt-1">Tối thiểu 5.000.000 VNĐ</p>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách linh kiện -->
+                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg> Chọn linh kiện (không bắt buộc chọn hết)
+                    </h3>
+                    <div class="space-y-4 mb-8">
+                        <% pcParts.forEach(part=> { %>
+                            <div
+                                class="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 hover:border-blue-200 transition-all">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                        <% if (part==='cpu' ) { %>
+                                            <% } %>
+                                                <% if (part==='gpu' ) { %>
+                                                    <% } %>
+                                                        <% if (part==='ram' ) { %>
+                                                            <% } %>
+                                                                <% if (part==='storage' ) { %>
+                                                                    <% } %>
+                                                                        <% if (part==='motherboard' ) { %>
+                                                                            <% } %>
+                                                                                <% if (part==='psu' ) { %>
+                                                                                    <% } %>
+                                                                                        <% if (part==='case' ) { %>
+                                                                                            <% } %>
+                                                                                                <%= partLabels[part] %>
+                                    </label>
+                                    <span class="text-xs text-slate-400 font-medium" id="price-<%= part %>">Chưa
+                                        chọn</span>
+                                </div>
+                                <select id="select-<%= part %>" onchange="onPartSelect('<%= part %>', this.value)"
+                                    class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
+                                    <option value="">— Để AI tự chọn —</option>
+                                    <% if (allParts[part] && allParts[part].products) { %>
+                                        <% allParts[part].products.forEach(p=> { %>
+                                            <option value="<%= p._id %>" data-price="<%= p.salePrice || p.price %>">
+                                                <%= p.brand %> - <%= p.name %> — <%= (p.salePrice ||
+                                                            p.price).toLocaleString('vi-VN') %>đ
+                                            </option>
+                                            <% }) %>
+                                                <% } %>
+                                </select>
+                            </div>
+                            <% }) %>
+                    </div>
+
+                    <!-- Nút gợi ý -->
+                    <button id="btn-hybrid-suggest" onclick="hybridSuggest()"
+                        class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-3 text-base">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                        <span>Hoàn thiện cấu hình bằng AI</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- KẾT QUẢ CẤU HÌNH -->
+    <!-- ============================================ -->
+    <div id="result-section" class="container mx-auto px-6 mt-8 mb-16 hidden">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+
+            <!-- Header kết quả -->
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-6 text-white">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h2 class="text-xl font-black font-heading">Cấu Hình Đề Xuất</h2>
+                            <p class="text-emerald-100 text-sm" id="result-subtitle">Mục đích: Gaming</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-emerald-100 text-xs font-bold uppercase tracking-widest">Tổng tiền</p>
+                        <p class="text-3xl font-black" id="result-total">0đ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phân tích AI (chỉ hiện ở AI Mode) -->
+            <div id="analysis-section" class="bg-blue-50/50 border-b border-blue-100 p-6 hidden">
+                <h3 class="text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                        </path>
+                    </svg> Phân tích AI
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="analysis-grid">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Danh sách linh kiện -->
+            <div class="p-6">
+                <div class="space-y-4" id="result-parts">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Budget Info -->
+            <div class="border-t border-slate-100 p-6" id="budget-info">
+                <!-- Filled by JS -->
+            </div>
+
+            <!-- Actions -->
+            <div class="border-t border-slate-100 p-6 bg-slate-50/50">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="addAllToCart()"
+                        class="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 active:scale-[0.98] flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z">
+                            </path>
+                        </svg>
+                        <span>Thêm tất cả vào giỏ hàng</span>
+                    </button>
+                    <button onclick="resetBuilder()"
+                        class="px-8 py-4 bg-white text-slate-600 font-bold rounded-2xl border-2 border-slate-200 hover:border-blue-300 hover:text-blue-600 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
+                        <span>Làm lại</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay"
+        class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden">
+        <div class="bg-white rounded-3xl p-10 shadow-2xl text-center max-w-sm mx-4">
+            <div class="relative w-20 h-20 mx-auto mb-6">
+                <div class="absolute inset-0 rounded-full border-4 border-blue-100"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin">
+                </div>
+                <div class="absolute inset-3 rounded-full border-4 border-indigo-300 border-b-transparent animate-spin"
+                    style="animation-direction: reverse; animation-duration: 1.5s"></div>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2 font-heading">AI đang phân tích...</h3>
+            <p class="text-sm text-slate-500" id="loading-text">Đang tìm kiếm cấu hình phù hợp nhất</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================ -->
+    <script>
+        // --- Biến toàn cục ---
+        let currentMode = 'ai';
+        let currentResult = null;
+
+        // --- Format tiền VNĐ ---
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
+        }
+
+        // --- Chuyển đổi tab ---
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('panel-ai').classList.toggle('hidden', mode !== 'ai');
+            document.getElementById('panel-hybrid').classList.toggle('hidden', mode !== 'hybrid');
+            document.getElementById('tab-ai-indicator').style.transform = mode === 'ai' ? 'scaleX(1)' : 'scaleX(0)';
+            document.getElementById('tab-hybrid-indicator').style.transform = mode === 'hybrid' ? 'scaleX(1)' : 'scaleX(0)';
+            // Reset kết quả
+            document.getElementById('result-section').classList.add('hidden');
+        }
+
+        // --- Điền ví dụ mẫu ---
+        function fillExample(btn) {
+            const text = btn.innerText.replace(/^[^\s]+\s/, '').replace(/"/g, '');
+            document.getElementById('ai-description').value = text;
+            updateCharCount();
+        }
+
+        // --- Đếm ký tự ---
+        function updateCharCount() {
+            const val = document.getElementById('ai-description').value;
+            document.getElementById('char-count').innerText = val.length;
+        }
+        document.getElementById('ai-description').addEventListener('input', updateCharCount);
+
+        // --- Hiện/Ẩn Loading ---
+        function showLoading(text) {
+            document.getElementById('loading-text').innerText = text || 'Đang xử lý...';
+            document.getElementById('loading-overlay').classList.remove('hidden');
+        }
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+        }
+
+        // --- Cập nhật giá khi chọn linh kiện (Hybrid) ---
+        function onPartSelect(part, value) {
+            const select = document.getElementById('select-' + part);
+            const priceEl = document.getElementById('price-' + part);
+            if (value) {
+                const option = select.options[select.selectedIndex];
+                const price = parseInt(option.getAttribute('data-price'));
+                priceEl.innerText = formatPrice(price);
+                priceEl.classList.add('text-blue-600');
+                priceEl.classList.remove('text-slate-400');
+            } else {
+                priceEl.innerText = 'Để AI tự chọn';
+                priceEl.classList.remove('text-blue-600');
+                priceEl.classList.add('text-slate-400');
+            }
+        }
+
+        // ============================================
+        // AI MODE: GỬI REQUEST SINH CẤU HÌNH
+        // ============================================
+        async function aiGenerateConfig() {
+            const desc = document.getElementById('ai-description').value.trim();
+            if (!desc || desc.length < 5) {
+                showToast('Vui lòng mô tả nhu cầu sử dụng (ít nhất 5 ký tự)', 'error');
+                return;
+            }
+
+            showLoading('AI đang phân tích nhu cầu của bạn...');
+            document.getElementById('btn-ai-build').disabled = true;
+
+            try {
+                const res = await fetch('/api/ai/build-pc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description: desc })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    currentResult = data.data;
+                    renderResult(data.data, 'ai');
+                    showToast(' AI đã tạo cấu hình thành công!', 'success');
+                } else {
+                    showToast(data.message || 'Có lỗi xảy ra!', 'error');
+                }
+            } catch (err) {
+                showToast('Không thể kết nối server. Vui lòng thử lại.', 'error');
+            } finally {
+                hideLoading();
+                document.getElementById('btn-ai-build').disabled = false;
+            }
+        }
+
+        // ============================================
+        // HYBRID MODE: GỬI REQUEST GỢI Ý
+        // ============================================
+        async function hybridSuggest() {
+            const purpose = document.getElementById('hybrid-purpose').value;
+            const budget = document.getElementById('hybrid-budget').value;
+
+            // Thu thập linh kiện đã chọn
+            const selectedParts = {};
+            const parts = ['cpu', 'gpu', 'ram', 'storage', 'motherboard', 'psu', 'case'];
+            let hasSelection = false;
+
+            parts.forEach(part => {
+                const val = document.getElementById('select-' + part).value;
+                if (val) {
+                    selectedParts[part] = val;
+                    hasSelection = true;
+                }
+            });
+
+            if (!hasSelection) {
+                showToast('Vui lòng chọn ít nhất 1 linh kiện, AI sẽ gợi ý phần còn lại!', 'error');
+                return;
+            }
+
+            showLoading('AI đang tìm linh kiện tương thích...');
+            document.getElementById('btn-hybrid-suggest').disabled = true;
+
+            try {
+                const res = await fetch('/api/ai/suggest-parts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ selectedParts, purpose, budget })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    currentResult = data.data;
+                    renderResult(data.data, 'hybrid');
+                    showToast(' AI đã gợi ý linh kiện thành công!', 'success');
+                } else {
+                    showToast(data.message || 'Có lỗi xảy ra!', 'error');
+                }
+            } catch (err) {
+                showToast('Không thể kết nối server. Vui lòng thử lại.', 'error');
+            } finally {
+                hideLoading();
+                document.getElementById('btn-hybrid-suggest').disabled = false;
+            }
+        }
+
+        // ============================================
+        // RENDER KẾT QUẢ
+        // ============================================
+        function renderResult(data, mode) {
+            const resultSection = document.getElementById('result-section');
+            const partsContainer = document.getElementById('result-parts');
+            const analysisSection = document.getElementById('analysis-section');
+
+            // Subtitle
+            const purposeLabel = mode === 'ai' ? data.analysis.purposeLabel : data.purposeLabel;
+            document.getElementById('result-subtitle').innerText = `Mục đích: ${purposeLabel}`;
+
+            // Tổng tiền
+            document.getElementById('result-total').innerText = formatPrice(data.totalPrice);
+
+            // Phân tích AI (chỉ hiện ở AI Mode)
+            if (mode === 'ai' && data.analysis) {
+                analysisSection.classList.remove('hidden');
+                document.getElementById('analysis-grid').innerHTML = `
+                <div class="bg-white rounded-xl p-3 border border-blue-100">
+                    <p class="text-xs text-blue-500 font-bold mb-1"> Mục đích</p>
+                    <p class="text-sm font-bold text-slate-800">${data.analysis.purposeLabel}</p>
+                </div>
+                <div class="bg-white rounded-xl p-3 border border-blue-100">
+                    <p class="text-xs text-blue-500 font-bold mb-1"> Ngân sách</p>
+                    <p class="text-sm font-bold text-slate-800">${formatPrice(data.analysis.budget)}</p>
+                </div>
+                <div class="bg-white rounded-xl p-3 border border-blue-100">
+                    <p class="text-xs text-blue-500 font-bold mb-1"> Từ khóa nhận diện</p>
+                    <p class="text-sm font-bold text-slate-800">${data.analysis.detectedKeywords.join(', ') || 'N/A'}</p>
+                </div>
+                <div class="bg-white rounded-xl p-3 border border-blue-100">
+                    <p class="text-xs text-blue-500 font-bold mb-1"> Linh kiện tìm được</p>
+                    <p class="text-sm font-bold text-slate-800">${data.partsCount}/${data.totalParts}</p>
+                </div>
+            `;
+            } else {
+                analysisSection.classList.add('hidden');
+            }
+
+            // Render danh sách linh kiện
+            const config = data.config;
+            let partsHTML = '';
+
+            // Icon SVG cho từng loại linh kiện
+            const svgIcon = (path) => `<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${path}"></path></svg>`;
+            const partIcons = {
+                cpu: svgIcon('M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z'),
+                gpu: svgIcon('M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z'),
+                ram: svgIcon('M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4'),
+                storage: svgIcon('M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4'),
+                motherboard: svgIcon('M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2'),
+                psu: svgIcon('M13 10V3L4 14h7v7l9-11h-7z'),
+                case: svgIcon('M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z')
+            };
+
+            Object.entries(config).forEach(([part, info]) => {
+                const p = info.product;
+                const isSelected = info.isSelected;
+                const badgeClass = isSelected
+                    ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                    : 'bg-blue-100 text-blue-700 border-blue-200';
+                const badgeText = isSelected ? ' Bạn đã chọn' : ' AI gợi ý';
+
+                partsHTML += `
+                < div class="flex items-center gap-5 p-5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all group" >
+                    <!-- Icon -->
+                    <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:shadow-md transition-shadow">
+                        ${partIcons[part] || ''}
+                    </div>
+                    <!--Ảnh sản phẩm-- >
+                    <div class="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img src="${p.thumbnail || '/images/default-product.webp'}" alt="${p.name}" class="w-14 h-14 object-contain">
+                    </div>
+                    <!--Thông tin-- >
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="text-xs font-bold ${badgeClass} px-2 py-0.5 rounded-full border">${badgeText}</span>
+                            <span class="text-xs font-bold text-slate-400 uppercase">${info.label}</span>
+                        </div>
+                        <a href="/san-pham/${p.slug}" target="_blank" class="text-sm font-bold text-slate-800 hover:text-blue-600 transition-colors line-clamp-1">${p.name}</a>
+                        <p class="text-xs text-slate-400 mt-0.5">${p.brand || ''} • Rating: ${p.rating || 0}</p>
+                    </div>
+                    <!--Giá -->
+                <div class="text-right flex-shrink-0">
+                    ${p.salePrice && p.salePrice < p.price ? `
+                            <p class="text-xs text-slate-400 line-through">${formatPrice(p.price)}</p>
+                            <p class="text-base font-black text-red-600">${formatPrice(p.salePrice)}</p>
+                        ` : `
+                            <p class="text-base font-black text-slate-800">${formatPrice(p.price)}</p>
+                        `}
+                </div>
+                </div >
+                `;
+            });
+
+            // Linh kiện không có sẵn
+            if (data.unavailableParts && data.unavailableParts.length > 0) {
+                data.unavailableParts.forEach(up => {
+                    partsHTML += `
+                < div class="flex items-center gap-5 p-5 bg-amber-50/50 rounded-2xl border border-amber-100" >
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-2xl"></div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-amber-800">${up.label}</p>
+                        <p class="text-xs text-amber-600">Không tìm thấy sản phẩm phù hợp trong kho (ngân sách: ${formatPrice(up.budgetAllocated)})</p>
+                    </div>
+                </div > `;
+                });
+            }
+
+            partsContainer.innerHTML = partsHTML;
+
+            // Budget Info
+            const budgetDiff = data.budgetDifference || 0;
+            const budget = mode === 'ai' ? data.analysis.budget : data.totalBudget;
+            document.getElementById('budget-info').innerHTML = `
+                < div class="flex items-center justify-between flex-wrap gap-4" >
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Ngân sách dự kiến</p>
+                    <p class="text-xl font-black text-slate-800">${formatPrice(budget)}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-bold uppercase tracking-widest mb-1 ${budgetDiff >= 0 ? 'text-emerald-500' : 'text-red-500'}">
+                        ${budgetDiff >= 0 ? ' Tiết kiệm được' : ' Vượt ngân sách'}
+                    </p>
+                    <p class="text-xl font-black ${budgetDiff >= 0 ? 'text-emerald-600' : 'text-red-600'}">
+                        ${budgetDiff >= 0 ? '+' : ''}${formatPrice(Math.abs(budgetDiff))}
+                    </p>
+                </div>
+            </div >
+                `;
+
+            // Hiện kết quả
+            resultSection.classList.remove('hidden');
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ============================================
+        // THÊM TẤT CẢ VÀO GIỎ HÀNG
+        // ============================================
+        async function addAllToCart() {
+            if (!currentResult || !currentResult.config) {
+                showToast('Không có cấu hình để thêm!', 'error');
+                return;
+            }
+
+            showLoading('Đang thêm tất cả linh kiện vào giỏ hàng...');
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const [part, info] of Object.entries(currentResult.config)) {
+                try {
+                    const res = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: info.product._id, quantity: 1 })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (err) {
+                    failCount++;
+                }
+            }
+
+            hideLoading();
+
+            if (successCount > 0) {
+                showToast(`Đã thêm ${successCount} linh kiện vào giỏ hàng! `, 'success');
+                // Refresh cart count
+                if (typeof loadCartCount === 'function') loadCartCount();
+            }
+            if (failCount > 0) {
+                showToast(`${failCount} linh kiện không thể thêm(có thể bạn chưa đăng nhập)`, 'error');
+            }
+        }
+
+        // ============================================
+        // RESET
+        // ============================================
+        function resetBuilder() {
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('ai-description').value = '';
+            updateCharCount();
+            currentResult = null;
+
+            // Reset hybrid selects
+            const parts = ['cpu', 'gpu', 'ram', 'storage', 'motherboard', 'psu', 'case'];
+            parts.forEach(part => {
+                const select = document.getElementById('select-' + part);
+                if (select) select.value = '';
+                const priceEl = document.getElementById('price-' + part);
+                if (priceEl) {
+                    priceEl.innerText = 'Chưa chọn';
+                    priceEl.classList.remove('text-blue-600');
+                    priceEl.classList.add('text-slate-400');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+    <style>
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.5s ease-out;
+        }
+
+        .active-tab {
+            background-color: rgba(59, 130, 246, 0.03);
+        }
+    </style>
