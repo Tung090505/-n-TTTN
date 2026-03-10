@@ -425,6 +425,22 @@ const PURPOSE_DICTIONARY = {
             { word: 'e-learning', weight: 4 },
             { word: 'học online', weight: 4 },
         ]
+    },
+    'laptop': {
+        label: 'Laptop',
+        keywords: [
+            { word: 'laptop', weight: 10 },
+            { word: 'máy tính xách tay', weight: 10 },
+            { word: 'macbook', weight: 10 },
+            { word: 'mac', weight: 5 },
+            { word: 'vivobook', weight: 8 },
+            { word: 'thinkpad', weight: 8 },
+            { word: 'legion', weight: 8 },
+            { word: 'dell xps', weight: 8 },
+            { word: 'văn phòng di động', weight: 6 },
+            { word: 'mang đi', weight: 5 },
+            { word: 'di chuyển', weight: 5 },
+        ]
     }
 };
 

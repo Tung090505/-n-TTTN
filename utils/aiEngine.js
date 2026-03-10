@@ -240,7 +240,8 @@ function analyzeDescription(description) {
     if (!result.budget) {
         const defaultBudgets = {
             gaming: 25000000, 'do-hoa': 30000000, 'van-phong': 12000000,
-            'lap-trinh': 20000000, 'hoc-tap': 15000000, 'da-nang': 20000000
+            'lap-trinh': 20000000, 'hoc-tap': 15000000, 'da-nang': 20000000,
+            'laptop': 15000000
         };
         result.budget = defaultBudgets[result.purpose];
     }
@@ -598,11 +599,66 @@ async function buildPCFromDescription(description) {
     const idf = computeIDF(documents);
 
     // Bước 5: Tìm sản phẩm theo thứ tự ưu tiên
-    const priorityOrder = PRIORITY_ORDERS[analysis.purpose] || PC_PARTS;
     const config = {};
     let totalPrice = 0;
     const unavailableParts = [];
     let remainingBudget = analysis.budget;
+
+    // KIỂM TRA NẾU LÀ LAPTOP
+    const isLaptopRequested = analysis.purpose === 'laptop' ||
+        description.toLowerCase().includes('laptop') ||
+        description.toLowerCase().includes('macbook') ||
+        description.toLowerCase().includes('máy tính xách tay');
+
+    if (isLaptopRequested) {
+        const result = await findBestProduct(
+            'laptop', analysis.budget, template, userTokens, idf, analysis.priorities
+        );
+
+        if (result) {
+            const actualPrice = result.product.salePrice || result.product.price;
+            config['laptop'] = {
+                product: result.product,
+                budgetAllocated: analysis.budget,
+                actualPrice: actualPrice,
+                label: 'Laptop',
+                score: result.score,
+                scoreBreakdown: result.breakdown,
+                alternatives: result.alternatives || []
+            };
+            totalPrice = actualPrice;
+            remainingBudget = analysis.budget - actualPrice;
+
+            return {
+                success: true,
+                isLaptop: true,
+                analysis: {
+                    purpose: analysis.purpose,
+                    purposeLabel: 'Laptop',
+                    budget: analysis.budget,
+                    budgetTier: analysis.budgetTier,
+                    detectedKeywords: analysis.detectedKeywords,
+                    priorities: analysis.priorities,
+                    confidenceScore: analysis.confidenceScore,
+                    aiResponse: 'Tôi đã tìm thấy mẫu laptop tốt nhất phù hợp với yêu cầu của bạn:',
+                    templateUsed: 'Laptop Search',
+                },
+                config,
+                totalPrice,
+                budgetDifference: analysis.budget - totalPrice,
+                partsCount: 1,
+                totalParts: 1
+            };
+        } else {
+            // Trường hợp không tìm thấy laptop nào
+            return {
+                success: false,
+                message: `Rất tiếc, TechStore hiện không có mẫu Laptop nào phù hợp với ngân sách ${analysis.budget.toLocaleString('vi-VN')}đ của bạn. Bạn có thể thử tăng ngân sách hoặc đổi sang Build PC để bàn.`
+            };
+        }
+    }
+
+    const priorityOrder = PRIORITY_ORDERS[analysis.purpose] || PC_PARTS;
 
     for (const part of priorityOrder) {
         const budgetForPart = analysis.budget * allocation[part];

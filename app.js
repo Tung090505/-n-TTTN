@@ -218,6 +218,9 @@ app.use(async (req, res, next) => {
     next();
 });
 
+// Xử lý Favicon (Tránh lỗi 404 log)
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // ============================================
 // ĐỊNH NGHĨA ROUTES
 // ============================================

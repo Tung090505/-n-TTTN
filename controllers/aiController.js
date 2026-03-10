@@ -51,6 +51,13 @@ exports.aiBuildPC = async (req, res, next) => {
 
         const result = await buildPCFromDescription(description);
 
+        if (!result.success) {
+            return res.json({
+                success: false,
+                message: result.message
+            });
+        }
+
         res.json({
             success: true,
             data: result

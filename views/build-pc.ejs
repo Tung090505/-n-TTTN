@@ -80,8 +80,8 @@
                         <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
                             <span></span> Hướng dẫn
                         </h3>
-                        <p class="text-sm text-slate-600 mb-3">Mô tả nhu cầu sử dụng máy tính của bạn, ví dụ:</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <p class="text-sm text-slate-600 mb-3 font-bold">Dành cho Build PC để bàn:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                             <button onclick="fillExample(this)"
                                 class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
                                 "Tôi cần PC gaming ngân sách 30 triệu, chơi game 4K"
@@ -97,6 +97,42 @@
                             <button onclick="fillExample(this)"
                                 class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
                                 "PC lập trình, chạy Docker, VS Code, ngân sách 20 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "PC Livestream chuyên nghiệp và làm YouTube, tầm 40 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "PC cấu hình mạnh chạy Deep Learning, AI, tầm 50 triệu"
+                            </button>
+                        </div>
+
+                        <p class="text-sm text-slate-600 mb-3 font-bold">Dành cho tìm Laptop:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Tôi muốn laptop gaming cấu hình mạnh, tầm 30 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Laptop văn phòng mỏng nhẹ, sang trọng, ngân sách 20 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Máy tính xách tay học tập giá rẻ cho sinh viên, tầm 12 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Laptop làm đồ họa chuyên nghiệp, màn hình chuẩn màu, tầm 35 triệu"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Tìm một chiếc máy tính xách tay mỏng nhẹ, pin trâu cho doanh nhân"
+                            </button>
+                            <button onclick="fillExample(this)"
+                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
+                                "Macbook cấu hình mạnh để lập trình Mobile và iOS, tầm 45 triệu"
                             </button>
                         </div>
                     </div>
@@ -336,7 +372,7 @@
 
         // --- Điền ví dụ mẫu ---
         function fillExample(btn) {
-            const text = btn.innerText.replace(/^[^\s]+\s/, '').replace(/"/g, '');
+            const text = btn.innerText.trim().replace(/^"|"$/g, '');
             document.getElementById('ai-description').value = text;
             updateCharCount();
         }
@@ -398,7 +434,6 @@
                 if (data.success) {
                     currentResult = data.data;
                     renderResult(data.data, 'ai');
-                    showToast(' AI đã tạo cấu hình thành công!', 'success');
                 } else {
                     showToast(data.message || 'Có lỗi xảy ra!', 'error');
                 }
@@ -449,7 +484,6 @@
                 if (data.success) {
                     currentResult = data.data;
                     renderResult(data.data, 'hybrid');
-                    showToast(' AI đã gợi ý linh kiện thành công!', 'success');
                 } else {
                     showToast(data.message || 'Có lỗi xảy ra!', 'error');
                 }
@@ -514,7 +548,8 @@
                 storage: svgIcon('M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4'),
                 motherboard: svgIcon('M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2'),
                 psu: svgIcon('M13 10V3L4 14h7v7l9-11h-7z'),
-                case: svgIcon('M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z')
+                case: svgIcon('M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z'),
+                laptop: svgIcon('M4 18h16a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2zM2 18h20v2H2v-2z'),
             };
 
             Object.entries(config).forEach(([part, info]) => {
@@ -526,16 +561,16 @@
                 const badgeText = isSelected ? ' Bạn đã chọn' : ' AI gợi ý';
 
                 partsHTML += `
-                < div class="flex items-center gap-5 p-5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all group" >
+                <div class="flex items-center gap-5 p-5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all group">
                     <!-- Icon -->
                     <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl shadow-sm group-hover:shadow-md transition-shadow">
                         ${partIcons[part] || ''}
                     </div>
-                    <!--Ảnh sản phẩm-- >
+                    <!--Ảnh sản phẩm-->
                     <div class="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                         <img src="${p.thumbnail || '/images/default-product.webp'}" alt="${p.name}" class="w-14 h-14 object-contain">
                     </div>
-                    <!--Thông tin-- >
+                    <!--Thông tin-->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="text-xs font-bold ${badgeClass} px-2 py-0.5 rounded-full border">${badgeText}</span>
@@ -553,7 +588,7 @@
                             <p class="text-base font-black text-slate-800">${formatPrice(p.price)}</p>
                         `}
                 </div>
-                </div >
+                </div>
                 `;
             });
 
@@ -561,13 +596,13 @@
             if (data.unavailableParts && data.unavailableParts.length > 0) {
                 data.unavailableParts.forEach(up => {
                     partsHTML += `
-                < div class="flex items-center gap-5 p-5 bg-amber-50/50 rounded-2xl border border-amber-100" >
+                <div class="flex items-center gap-5 p-5 bg-amber-50/50 rounded-2xl border border-amber-100">
                     <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-2xl"></div>
                     <div class="flex-1">
                         <p class="text-sm font-bold text-amber-800">${up.label}</p>
                         <p class="text-xs text-amber-600">Không tìm thấy sản phẩm phù hợp trong kho (ngân sách: ${formatPrice(up.budgetAllocated)})</p>
                     </div>
-                </div > `;
+                </div>`;
                 });
             }
 
@@ -577,7 +612,7 @@
             const budgetDiff = data.budgetDifference || 0;
             const budget = mode === 'ai' ? data.analysis.budget : data.totalBudget;
             document.getElementById('budget-info').innerHTML = `
-                < div class="flex items-center justify-between flex-wrap gap-4" >
+                <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Ngân sách dự kiến</p>
                     <p class="text-xl font-black text-slate-800">${formatPrice(budget)}</p>
@@ -590,7 +625,7 @@
                         ${budgetDiff >= 0 ? '+' : ''}${formatPrice(Math.abs(budgetDiff))}
                     </p>
                 </div>
-            </div >
+            </div>
                 `;
 
             // Hiện kết quả

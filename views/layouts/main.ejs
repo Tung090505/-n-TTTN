@@ -34,6 +34,7 @@
 
     .text-gradient {
       background: linear-gradient(to right, #3b82f6, #6366f1);
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -53,8 +54,13 @@
       <!-- Global Notification System -->
       <div id="toast-container" class="fixed top-24 right-6 z-[9999] flex flex-col gap-4 max-w-sm w-full"></div>
 
+      <!-- Hidden Data for Flash Messages (Prevents Linter Errors) -->
+      <div id="flash-messages" data-success="<%= locals.success || '' %>" data-error="<%= locals.error || '' %>">
+      </div>
+
       <script>
         function showToast(message, type = 'success') {
+          if (!message) return;
           const container = document.getElementById('toast-container');
           const toast = document.createElement('div');
 
@@ -79,13 +85,13 @@
           }, 5000);
         }
 
-        // Handle flash messages
-        <% if (locals.success) { %>
-          showToast("<%= success %>", 'success');
-        <% } %>
-        <% if (locals.error) { %>
-          showToast("<%= error %>", 'error');
-        <% } %>
+        // Handle flash messages safely
+        const flashData = document.getElementById('flash-messages');
+        const successMessage = flashData.dataset.success;
+        const errorMessage = flashData.dataset.error;
+
+        if (successMessage) showToast(successMessage, 'success');
+        if (errorMessage) showToast(errorMessage, 'error');
 
         // Check for specific query params (like registration success)
         const urlParams = new URLSearchParams(window.location.search);
