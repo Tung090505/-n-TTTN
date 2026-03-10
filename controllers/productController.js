@@ -95,6 +95,22 @@ exports.createProduct = async (req, res, next) => {
             req.body.thumbnail = req.file.path;
         }
 
+        // --- XỬ LÝ THÔNG SỐ KỸ THUẬT (Dạng JSON string từ Admin gửi lên) ---
+        if (req.body.specifications) {
+            let specs = req.body.specifications;
+            // Parse cho đến khi nó là Object (phòng trường hợp bị stringify nhiều lần)
+            while (typeof specs === 'string') {
+                try {
+                    specs = JSON.parse(specs);
+                    if (typeof specs !== 'object') break; // Nếu parse ra số hoặc null thì dừng
+                } catch (e) {
+                    specs = {};
+                    break;
+                }
+            }
+            req.body.specifications = specs || {};
+        }
+
         const product = await Product.create(req.body);
 
         res.status(201).json({
@@ -122,6 +138,22 @@ exports.updateProduct = async (req, res, next) => {
         // Nếu có file ảnh mới được upload
         if (req.file) {
             req.body.thumbnail = req.file.path;
+        }
+
+        // --- XỬ LÝ THÔNG SỐ KỸ THUẬT (Dạng JSON string từ Admin gửi lên) ---
+        if (req.body.specifications) {
+            let specs = req.body.specifications;
+            while (typeof specs === 'string') {
+                try {
+                    specs = JSON.parse(specs);
+                    if (typeof specs !== 'object') break;
+                } catch (e) {
+                    break; // Giữ nguyên nếu lỗi nặng
+                }
+            }
+            if (typeof specs === 'object' && specs !== null) {
+                req.body.specifications = specs;
+            }
         }
 
         // Cập nhật các trường thông tin từ req.body

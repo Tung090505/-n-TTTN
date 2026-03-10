@@ -199,12 +199,18 @@
             const row = document.createElement('div');
             row.className = 'flex items-center gap-3 spec-item-row';
             row.innerHTML = `
-                <input type="text" placeholder="Tên thông số (VD: ram)" value="${key}" class="spec-key w-1/3 px-4 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 transition-all">
-                <input type="text" placeholder="Giá trị (VD: 16GB)" value="${val}" class="spec-val flex-1 px-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 outline-none focus:border-blue-500 transition-all">
+                <input type="text" placeholder="Tên thông số (VD: ram)" class="spec-key w-1/3 px-4 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 transition-all">
+                <input type="text" placeholder="Giá trị (VD: 16GB)" class="spec-val flex-1 px-4 py-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 outline-none focus:border-blue-500 transition-all">
                 <button type="button" class="del-spec-btn w-10 h-10 shrink-0 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             `;
+
+            // Gán giá trị bằng code thay vì template literal để không bị lỗi dấu ngoặc kép (")
+            const keyInput = row.querySelector('.spec-key');
+            const valInput = row.querySelector('.spec-val');
+            keyInput.value = key;
+            valInput.value = val;
 
             row.querySelector('.del-spec-btn').onclick = () => row.remove();
             specList.appendChild(row);
@@ -213,8 +219,38 @@
         // Lấy dữ liệu ban đầu từ database (ẩn trong textarea)
         let initialSpecs = {};
         try {
-            initialSpecs = JSON.parse(hiddenSpecs.value || '{}');
-        } catch (e) { initialSpecs = {}; }
+            const rawValue = hiddenSpecs.value.trim();
+            initialSpecs = rawValue ? JSON.parse(rawValue) : {};
+
+            // Parse cho đến khi nó là Object (phòng trường hợp bị stringify nhiều lần)
+            while (typeof initialSpecs === 'string' && initialSpecs.length > 0) {
+                initialSpecs = JSON.parse(initialSpecs);
+            }
+
+            // --- KIỂM TRA VÀ SỬA LỖI (Repair) ---
+            // Nếu parse ra vẫn là một object có các key 0, 1, 2...
+            // thì rất có thể nó đã bị lưu lỗi dạng chuỗi ký tự.
+            if (initialSpecs && typeof initialSpecs === 'object') {
+                const keys = Object.keys(initialSpecs);
+                if (keys.length > 0 && keys.every(k => !isNaN(k)) && initialSpecs[keys[0]] === '{') {
+                    // Thử gộp lại thành chuỗi JSON và parse lại
+                    try {
+                        const reconstructed = keys.sort((a, b) => a - b).map(k => initialSpecs[k]).join('');
+                        initialSpecs = JSON.parse(reconstructed);
+                    } catch (e) {
+                        console.error('Không thể tự động sửa lỗi specs', e);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Lỗi parse specs:', e);
+            initialSpecs = {};
+        }
+
+        // Đảm bảo initialSpecs là object
+        if (typeof initialSpecs !== 'object' || initialSpecs === null) {
+            initialSpecs = {};
+        }
 
         // Render các dòng đã có
         Object.entries(initialSpecs).forEach(([k, v]) => createSpecRow(k, v));
