@@ -32,16 +32,32 @@
                                 class="w-full px-8 py-5 rounded-3xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-slate-900 appearance-none">
                                 <option value="laptop" <%=product && product.category==='laptop' ? 'selected' : '' %>
                                     >Laptop</option>
-                                <option value="cpu" <%=product && product.category==='cpu' ? 'selected' : '' %>>CPU
-                                </option>
-                                <option value="gpu" <%=product && product.category==='gpu' ? 'selected' : '' %>>VGA /
-                                    GPU</option>
-                                <option value="ram" <%=product && product.category==='ram' ? 'selected' : '' %>>RAM
-                                </option>
+                                <option value="pc" <%=product && product.category==='pc' ? 'selected' : '' %>>Máy tính
+                                    bộ (PC)</option>
+                                <option value="cpu" <%=product && product.category==='cpu' ? 'selected' : '' %>>Bộ vi xử
+                                    lý (CPU)</option>
+                                <option value="gpu" <%=product && product.category==='gpu' ? 'selected' : '' %>>Card đồ
+                                    họa (VGA)</option>
+                                <option value="ram" <%=product && product.category==='ram' ? 'selected' : '' %>>Bộ nhớ
+                                    (RAM)</option>
                                 <option value="storage" <%=product && product.category==='storage' ? 'selected' : '' %>
-                                    >SSD / HDD</option>
+                                    >Ổ cứng (SSD/HDD)</option>
+                                <option value="motherboard" <%=product && product.category==='motherboard' ? 'selected'
+                                    : '' %>>Bo mạch chủ (Mainboard)</option>
+                                <option value="psu" <%=product && product.category==='psu' ? 'selected' : '' %>>Nguồn
+                                    máy tính (PSU)</option>
+                                <option value="case" <%=product && product.category==='case' ? 'selected' : '' %>>Vỏ máy
+                                    tính (Case)</option>
+                                <option value="cooling" <%=product && product.category==='cooling' ? 'selected' : '' %>
+                                    >Tản nhiệt (Cooling)</option>
                                 <option value="monitor" <%=product && product.category==='monitor' ? 'selected' : '' %>
                                     >Màn hình</option>
+                                <option value="keyboard" <%=product && product.category==='keyboard' ? 'selected' : ''
+                                    %>>Bàn phím</option>
+                                <option value="mouse" <%=product && product.category==='mouse' ? 'selected' : '' %>
+                                    >Chuột máy tính</option>
+                                <option value="headset" <%=product && product.category==='headset' ? 'selected' : '' %>
+                                    >Tai nghe</option>
                             </select>
                         </div>
 

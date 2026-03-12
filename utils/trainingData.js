@@ -1,22 +1,4 @@
-/**
- * ============================================
- * utils/trainingData.js - DỮ LIỆU HUẤN LUYỆN CHO AI ENGINE
- * ============================================
- * Chứa tất cả dữ liệu "training" cho hệ thống AI Build PC:
- * 
- * 1. Mẫu cấu hình PC (Build Templates)
- * 2. Ma trận tương thích linh kiện (Compatibility Matrix)
- * 3. Từ điển mục đích sử dụng (Purpose Dictionary)
- * 4. Bảng ưu tiên linh kiện theo mục đích
- * 
- * → AI Engine sẽ "học" từ dữ liệu này để gợi ý thông minh
- */
 
-// ============================================
-// 1. MẪU CẤU HÌNH PC (BUILD TEMPLATES)
-// ============================================
-// Đây là "kiến thức" của AI - mỗi template dạy AI biết
-// cấu hình tốt cho từng mục đích + phân khúc giá
 const BUILD_TEMPLATES = [
     // ========== GAMING BUILDS ==========
     {
