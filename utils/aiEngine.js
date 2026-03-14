@@ -273,6 +273,15 @@ function analyzeDescription(description) {
     const responses = AI_RESPONSES.analysis[result.purpose] || AI_RESPONSES.analysis['hoc-tap'];
     result.aiResponse = responses[Math.floor(Math.random() * responses.length)];
 
+    // --- Bước 7: Nhận diện thương hiệu cụ thể ---
+    const brands = ['apple', 'macbook', 'asus', 'msi', 'gigabyte', 'hp', 'dell', 'acer', 'lenovo', 'razer', 'intel', 'amd', 'nvidia'];
+    result.requestedBrands = [];
+    brands.forEach(brand => {
+        if (text.includes(brand)) {
+            result.requestedBrands.push(brand);
+        }
+    });
+
     return result;
 }
 
@@ -405,13 +414,23 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
     scoreBreakdown.performance = perfScore;
     totalScore += scoreBreakdown.performance;
 
-    // --- 6. TF-IDF Similarity với mô tả người dùng (bonus 5 điểm) ---
+    // --- 6. TF-IDF Similarity với mô tả người dùng (bonus 15 điểm) ---
     if (userTokens && idf) {
         const productTokens = tokenize(`${product.name} ${product.description || ''} ${product.brand}`);
         const userVec = computeTFIDF(userTokens, idf);
         const productVec = computeTFIDF(productTokens, idf);
         const similarity = cosineSimilarity(userVec, productVec);
-        scoreBreakdown.textSimilarity = similarity * 5;
+        
+        // Bonus cực mạnh nếu user nhắc đến brand mà product này thuộc brand đó
+        let brandBonus = 0;
+        const userText = userTokens.join(' ');
+        if (userText.includes(product.brand.toLowerCase())) {
+            brandBonus = 15;
+        } else if (product.brand.toLowerCase() === 'apple' && (userText.includes('macbook') || userText.includes('mac'))) {
+            brandBonus = 15;
+        }
+
+        scoreBreakdown.textSimilarity = (similarity * 5) + brandBonus;
         totalScore += scoreBreakdown.textSimilarity;
     }
 
@@ -638,10 +657,11 @@ async function buildPCFromDescription(description) {
                     budget: analysis.budget,
                     budgetTier: analysis.budgetTier,
                     detectedKeywords: analysis.detectedKeywords,
+                    requestedBrands: analysis.requestedBrands,
                     priorities: analysis.priorities,
                     confidenceScore: analysis.confidenceScore,
                     aiResponse: 'Tôi đã tìm thấy mẫu laptop tốt nhất phù hợp với yêu cầu của bạn:',
-                    templateUsed: 'Laptop Search',
+                    templateUsed: template ? template.name : 'Laptop Search',
                 },
                 config,
                 totalPrice,

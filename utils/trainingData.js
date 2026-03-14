@@ -201,6 +201,38 @@ const BUILD_TEMPLATES = [
         },
         budgetAllocation: { cpu: 0.27, gpu: 0.08, ram: 0.13, storage: 0.20, motherboard: 0.15, psu: 0.09, case: 0.08 }
     },
+
+    // ========== LAPTOP BUILDS ==========
+    {
+        name: 'Laptop Văn phòng / Sinh viên (10-20 triệu)',
+        purpose: 'laptop',
+        tier: 'mid',
+        budgetRange: { min: 10000000, max: 20000000 },
+        idealSpecs: {
+            laptop: { brands: ['ASUS', 'HP', 'Dell', 'Acer', 'Lenovo'], keywords: ['Vivobook', 'Pavilion', 'Inspiron', 'Thin', 'Light'] }
+        },
+        budgetAllocation: { laptop: 1.0 }
+    },
+    {
+        name: 'Laptop Gaming / Đồ họa (20-35 triệu)',
+        purpose: 'laptop',
+        tier: 'high',
+        budgetRange: { min: 20000000, max: 35000000 },
+        idealSpecs: {
+            laptop: { brands: ['MSI', 'ASUS', 'Gigabyte', 'Lenovo', 'Acer'], keywords: ['Gaming', 'ROG', 'Victus', 'Legion', 'Katana', 'RTX'] }
+        },
+        budgetAllocation: { laptop: 1.0 }
+    },
+    {
+        name: 'Laptop Cao cấp / MacBook (35+ triệu)',
+        purpose: 'laptop',
+        tier: 'ultra',
+        budgetRange: { min: 35000000, max: 100000000 },
+        idealSpecs: {
+            laptop: { brands: ['Apple', 'Dell', 'ASUS', 'Razer'], keywords: ['MacBook', 'XPS', 'Zenbook', 'Studio', 'M3', 'M2', 'Pro'] }
+        },
+        budgetAllocation: { laptop: 1.0 }
+    },
 ];
 
 // ============================================

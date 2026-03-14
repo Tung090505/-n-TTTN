@@ -137,29 +137,13 @@ app.use(methodOverride('_method'));
 // Nén response để tăng tốc độ tải trang
 app.use(compression());
 
-// ============================================
-// MIDDLEWARE CHỐNG TẤN CÔNG DỮ LIỆU
-// ============================================
 
-/**
- * 5. MongoDB Sanitize - Chống NoSQL Injection
- * Loại bỏ các ký tự đặc biệt ($, .) trong request body/params/query
- * VD: Ngăn chặn: { "email": { "$gt": "" } }
- */
 app.use(mongoSanitize());
 
-/**
- * 6. XSS Clean - Chống Cross-Site Scripting
- * Làm sạch dữ liệu đầu vào, loại bỏ script độc hại
- * VD: Ngăn chặn: <script>document.cookie</script>
- */
+
 app.use(xss());
 
-/**
- * 7. HPP - Chống HTTP Parameter Pollution
- * Ngăn chặn tấn công bằng cách gửi nhiều giá trị cho cùng 1 tham số
- * VD: ?sort=price&sort=rating -> Chỉ lấy giá trị cuối cùng
- */
+
 app.use(hpp({
     // Các trường được phép có nhiều giá trị
     whitelist: ['price', 'rating', 'category', 'brand']
@@ -180,20 +164,19 @@ app.use(session({
     }
 }));
 
-// ============================================
-// STATIC FILES & LOGGING
-// ============================================
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Logging chỉ ở môi trường development
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-    console.log('🔧 Đang chạy ở chế độ Development');
+
+    app.use(morgan('dev', {
+        skip: (req, res) => res.statusCode < 400
+    }));
+    console.log('🔧 Đang chạy ở chế độ Development (Chỉ hiển thị log khi có lỗi >= 400)');
 }
 
-// ============================================
-// MIDDLEWARE TRUYỀN DỮ LIỆU CHO VIEW (EJS)
-// ============================================
+
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 

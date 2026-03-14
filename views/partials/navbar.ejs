@@ -180,5 +180,9 @@
                             }
                         } catch (err) { }
                     }
-  <% if (user) { %> loadCartCount(); <% } %>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        if (document.getElementById('cart-count')) {
+                            loadCartCount();
+                        }
+                    });
                 </script>
