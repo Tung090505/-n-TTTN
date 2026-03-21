@@ -1,11 +1,4 @@
-/**
- * ============================================
- * utils/seedPCParts.js - SEED DỮ LIỆU LINH KIỆN PC
- * ============================================
- * Chạy: node utils/seedPCParts.js
- * Thêm đầy đủ sản phẩm cho tất cả category
- * để AI Build PC hoạt động chính xác.
- */
+
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -13,9 +6,7 @@ const Product = require('../models/Product');
 const connectDB = require('../db');
 
 const pcPartProducts = [
-    // ============================================
-    // CPU - BỘ XỬ LÝ
-    // ============================================
+
     {
         name: 'AMD Ryzen 5 5600X',
         description: 'CPU gaming phổ biến nhất, hiệu năng cao, giá tốt. 6 nhân 12 luồng, xung boost 4.6GHz, TDP 65W.',
@@ -94,9 +85,6 @@ const pcPartProducts = [
         warranty: { months: 36, condition: 'Bảo hành chính hãng' }
     },
 
-    // ============================================
-    // GPU - CARD ĐỒ HỌA
-    // ============================================
     {
         name: 'ASUS Dual GeForce RTX 4060 OC 8GB',
         description: 'Card đồ họa RTX 4060 với 8GB GDDR6, ray tracing, DLSS 3, phù hợp gaming 1080p.',
@@ -153,9 +141,6 @@ const pcPartProducts = [
         warranty: { months: 36, condition: 'Bảo hành chính hãng ASUS' }
     },
 
-    // ============================================
-    // RAM - BỘ NHỚ
-    // ============================================
     {
         name: 'Kingston Fury Beast DDR4 16GB (2x8GB) 3200MHz',
         description: 'Bộ RAM DDR4 16GB Dual Channel, tốc độ 3200MHz CL16, tương thích rộng.',
@@ -201,9 +186,6 @@ const pcPartProducts = [
         warranty: { months: 60, condition: 'Bảo hành lifetime' }
     },
 
-    // ============================================
-    // STORAGE - Ổ CỨNG
-    // ============================================
     {
         name: 'Samsung 980 Pro 1TB NVMe M.2 SSD',
         description: 'SSD NVMe Gen4 nhanh nhất của Samsung, tốc độ đọc 7000MB/s, ghi 5000MB/s.',
@@ -249,9 +231,6 @@ const pcPartProducts = [
         warranty: { months: 60, condition: 'Bảo hành chính hãng' }
     },
 
-    // ============================================
-    // MOTHERBOARD - BO MẠCH CHỦ
-    // ============================================
     {
         name: 'Gigabyte B760M DS3H DDR4',
         description: 'Mainboard B760 hỗ trợ CPU Intel Gen 12/13/14, DDR4, form Micro ATX.',
@@ -308,9 +287,6 @@ const pcPartProducts = [
         warranty: { months: 36, condition: 'Bảo hành chính hãng' }
     },
 
-    // ============================================
-    // PSU - NGUỒN ĐIỆN
-    // ============================================
     {
         name: 'Corsair CV550 550W 80+ Bronze',
         description: 'Nguồn 550W chuẩn 80+ Bronze, đủ cho build gaming tầm trung, ổn định.',
@@ -367,9 +343,6 @@ const pcPartProducts = [
         warranty: { months: 120, condition: 'Bảo hành 10 năm' }
     },
 
-    // ============================================
-    // CASE - VỎ MÁY TÍNH
-    // ============================================
     {
         name: 'NZXT H5 Flow Mid Tower',
         description: 'Case mid tower thoáng khí với mặt lưới phía trước, hỗ trợ ATX, kính cường lực.',
@@ -427,9 +400,6 @@ const pcPartProducts = [
     },
 ];
 
-// ============================================
-// HÀM SEED DỮ LIỆU
-// ============================================
 const seedPCParts = async () => {
     try {
         await connectDB();
@@ -439,7 +409,7 @@ const seedPCParts = async () => {
         let skipped = 0;
 
         for (const product of pcPartProducts) {
-            // Kiểm tra sản phẩm đã tồn tại chưa (theo tên)
+            
             const existing = await Product.findOne({ name: product.name });
             if (existing) {
                 console.log(`   ⏭️  [${product.category.toUpperCase()}] ${product.name} - ĐÃ TỒN TẠI`);

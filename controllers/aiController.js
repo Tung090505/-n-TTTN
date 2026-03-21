@@ -1,10 +1,4 @@
-/**
- * ============================================
- * controllers/aiController.js - CONTROLLER AI BUILD PC
- * ============================================
- * Xử lý các request liên quan đến tính năng
- * AI tự động gợi ý cấu hình máy tính.
- */
+
 
 const {
     buildPCFromDescription,
@@ -15,12 +9,9 @@ const {
 } = require('../utils/aiEngine');
 const { PURPOSE_DICTIONARY } = require('../utils/trainingData');
 
-// ============================================
-// RENDER TRANG BUILD PC
-// ============================================
 exports.getBuildPC = async (req, res, next) => {
     try {
-        // Lấy danh sách sản phẩm cho Hybrid Mode dropdown
+        
         const allParts = await getAllPartsForSelection();
 
         res.render('build-pc', {
@@ -35,9 +26,6 @@ exports.getBuildPC = async (req, res, next) => {
     }
 };
 
-// ============================================
-// API: AI MODE - SINH CẤU HÌNH TỪ MÔ TẢ
-// ============================================
 exports.aiBuildPC = async (req, res, next) => {
     try {
         const { description } = req.body;
@@ -71,9 +59,6 @@ exports.aiBuildPC = async (req, res, next) => {
     }
 };
 
-// ============================================
-// API: HYBRID MODE - GỢI Ý LINH KIỆN CÒN LẠI
-// ============================================
 exports.suggestParts = async (req, res, next) => {
     try {
         const { selectedParts, purpose, budget } = req.body;

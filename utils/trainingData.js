@@ -1,6 +1,6 @@
 
 const BUILD_TEMPLATES = [
-    // ========== GAMING BUILDS ==========
+    
     {
         name: 'Gaming Entry (10-15 triệu)',
         purpose: 'gaming',
@@ -66,7 +66,6 @@ const BUILD_TEMPLATES = [
         budgetAllocation: { cpu: 0.17, gpu: 0.40, ram: 0.07, storage: 0.09, motherboard: 0.12, psu: 0.08, case: 0.07 }
     },
 
-    // ========== ĐỒ HỌA / RENDER BUILDS ==========
     {
         name: 'Đồ họa Entry (12-20 triệu)',
         purpose: 'do-hoa',
@@ -116,7 +115,6 @@ const BUILD_TEMPLATES = [
         budgetAllocation: { cpu: 0.23, gpu: 0.30, ram: 0.15, storage: 0.12, motherboard: 0.08, psu: 0.06, case: 0.06 }
     },
 
-    // ========== VĂN PHÒNG BUILDS ==========
     {
         name: 'Văn phòng cơ bản (5-10 triệu)',
         purpose: 'van-phong',
@@ -150,7 +148,6 @@ const BUILD_TEMPLATES = [
         budgetAllocation: { cpu: 0.30, gpu: 0.05, ram: 0.12, storage: 0.20, motherboard: 0.15, psu: 0.10, case: 0.08 }
     },
 
-    // ========== LẬP TRÌNH BUILDS ==========
     {
         name: 'Lập trình (12-22 triệu)',
         purpose: 'lap-trinh',
@@ -184,7 +181,6 @@ const BUILD_TEMPLATES = [
         budgetAllocation: { cpu: 0.25, gpu: 0.18, ram: 0.18, storage: 0.15, motherboard: 0.10, psu: 0.07, case: 0.07 }
     },
 
-    // ========== HỌC TẬP BUILDS ==========
     {
         name: 'Học tập cơ bản (7-12 triệu)',
         purpose: 'hoc-tap',
@@ -202,7 +198,6 @@ const BUILD_TEMPLATES = [
         budgetAllocation: { cpu: 0.27, gpu: 0.08, ram: 0.13, storage: 0.20, motherboard: 0.15, psu: 0.09, case: 0.08 }
     },
 
-    // ========== LAPTOP BUILDS ==========
     {
         name: 'Laptop Văn phòng / Sinh viên (10-20 triệu)',
         purpose: 'laptop',
@@ -235,13 +230,8 @@ const BUILD_TEMPLATES = [
     },
 ];
 
-// ============================================
-// 2. MA TRẬN TƯƠNG THÍCH LINH KIỆN
-// ============================================
-// Dữ liệu này giúp AI kiểm tra các linh kiện có hoạt động
-// cùng nhau được không (socket, RAM type, form factor...)
 const COMPATIBILITY_RULES = {
-    // CPU Socket ↔ Motherboard Socket
+    
     socketMapping: {
         'LGA1700': ['B660', 'H670', 'B760', 'H770', 'Z690', 'Z790'],
         'LGA1200': ['B460', 'H470', 'B560', 'H570', 'Z490', 'Z590'],
@@ -249,7 +239,6 @@ const COMPATIBILITY_RULES = {
         'AM4': ['B450', 'B550', 'X470', 'X570', 'A520'],
     },
 
-    // RAM Type ↔ Motherboard/CPU
     ramCompatibility: {
         'DDR5': {
             sockets: ['LGA1700', 'AM5'],
@@ -261,7 +250,6 @@ const COMPATIBILITY_RULES = {
         }
     },
 
-    // GPU Power Requirements → PSU wattage tối thiểu
     gpuPowerRequirements: {
         'GT 1030': 300,
         'GTX 1650': 350,
@@ -281,7 +269,6 @@ const COMPATIBILITY_RULES = {
         'RX 7900 XTX': 800,
     },
 
-    // Form Factor compatibility
     formFactorRules: {
         'ATX': ['ATX', 'Full Tower', 'Mid Tower'],
         'Micro ATX': ['Micro ATX', 'Mid Tower', 'Mini Tower'],
@@ -289,11 +276,6 @@ const COMPATIBILITY_RULES = {
     }
 };
 
-// ============================================
-// 3. TỪ ĐIỂN MỤC ĐÍCH SỬ DỤNG (MỞ RỘNG)
-// ============================================
-// Dạy AI nhận diện mục đích từ mô tả người dùng
-// Mỗi từ khóa có trọng số (weight) khác nhau
 const PURPOSE_DICTIONARY = {
     gaming: {
         label: 'Gaming',
@@ -458,11 +440,6 @@ const PURPOSE_DICTIONARY = {
     }
 };
 
-// ============================================
-// 4. BẢNG ƯU TIÊN LINH KIỆN THEO MỤC ĐÍCH
-// ============================================
-// Mỗi mục đích có thứ tự ưu tiên linh kiện khác nhau
-// VD: Gaming → GPU là quan trọng nhất, Văn phòng → CPU + Storage
 const PRIORITY_ORDERS = {
     gaming: ['gpu', 'cpu', 'ram', 'motherboard', 'storage', 'psu', 'case'],
     'do-hoa': ['cpu', 'gpu', 'ram', 'storage', 'motherboard', 'psu', 'case'],
@@ -472,13 +449,9 @@ const PRIORITY_ORDERS = {
     'da-nang': ['cpu', 'gpu', 'ram', 'storage', 'motherboard', 'psu', 'case'],
 };
 
-// ============================================
-// 5. THÔNG SỐ SO SÁNH HIỆU NĂNG (BENCHMARK DATA)
-// ============================================
-// Điểm hiệu năng tương đối để so sánh linh kiện cùng loại
 const PERFORMANCE_SCORES = {
     cpu: {
-        // Intel
+        
         'i3-12100': 45, 'i3-13100': 48,
         'i5-12400': 60, 'i5-12600K': 68,
         'i5-13400': 63, 'i5-13600K': 72,
@@ -487,7 +460,7 @@ const PERFORMANCE_SCORES = {
         'i7-13700': 80, 'i7-13700K': 83,
         'i7-14700': 82, 'i7-14700K': 85,
         'i9-13900K': 92, 'i9-14900K': 95,
-        // AMD
+        
         'Ryzen 3 3200G': 35, 'Ryzen 3 4100': 40,
         'Ryzen 5 5500': 55, 'Ryzen 5 5600': 58, 'Ryzen 5 5600X': 60,
         'Ryzen 5 7600': 68, 'Ryzen 5 7600X': 70,
@@ -510,10 +483,6 @@ const PERFORMANCE_SCORES = {
     }
 };
 
-// ============================================
-// 6. CÂU TRẢ LỜI AI (AI Response Templates)
-// ============================================
-// Các mẫu câu trả lời để AI "nói" tự nhiên hơn
 const AI_RESPONSES = {
     analysis: {
         gaming: [
@@ -544,9 +513,6 @@ const AI_RESPONSES = {
     }
 };
 
-// ============================================
-// EXPORTS
-// ============================================
 module.exports = {
     BUILD_TEMPLATES,
     COMPATIBILITY_RULES,

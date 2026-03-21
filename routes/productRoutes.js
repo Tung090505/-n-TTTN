@@ -1,8 +1,4 @@
-/**
- * ============================================
- * routes/productRoutes.js - ROUTES SẢN PHẨM
- * ============================================
- */
+
 
 const express = require('express');
 const router = express.Router();
@@ -12,18 +8,15 @@ const { protect, adminOnly } = require('../middleware/auth');
 const { validateProduct, validateProductQuery } = require('../middleware/validate');
 const { uploadCloud } = require('../config/cloudinary');
 
-// --- Public Routes ---
-router.get('/', validateProductQuery, productController.getProducts);      // Danh sách + bộ lọc
-router.get('/featured', productController.getFeaturedProducts); // Nổi bật
-router.get('/best-sellers', productController.getBestSellers);     // Bán chạy
-router.get('/:slug', productController.getProduct);         // Chi tiết 1 SP
+router.get('/', validateProductQuery, productController.getProducts);      
+router.get('/featured', productController.getFeaturedProducts); 
+router.get('/best-sellers', productController.getBestSellers);     
+router.get('/:slug', productController.getProduct);         
 
-// --- User Routes (Cần đăng nhập) ---
-router.post('/:id/reviews', protect, productController.addReview); // Đánh giá
+router.post('/:id/reviews', protect, productController.addReview); 
 
-// --- Admin Routes ---
-router.post('/', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.createProduct); // Tạo SP
-router.put('/:id', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.updateProduct); // Cập nhật
-router.delete('/:id', ...adminOnly, productController.deleteProduct); // Xóa
+router.post('/', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.createProduct); 
+router.put('/:id', ...adminOnly, uploadCloud.single('image'), validateProduct, productController.updateProduct); 
+router.delete('/:id', ...adminOnly, productController.deleteProduct); 
 
 module.exports = router;

@@ -1,29 +1,19 @@
-/**
- * ============================================
- * controllers/productController.js - QUẢN LÝ SẢN PHẨM
- * ============================================
- * CRUD operations và các tính năng lọc nâng cao
- */
+
 
 const Product = require('../models/Product');
 const ApiFeatures = require('../utils/apiFeatures');
 const { AppError } = require('../middleware/errorHandler');
 
-// ============================================
-// LẤY DANH SÁCH SẢN PHẨM (Bộ lọc nâng cao)
-// GET /api/products
-// ============================================
 exports.getProducts = async (req, res, next) => {
     try {
-        // Áp dụng bộ lọc nâng cao
+        
         const features = new ApiFeatures(Product.find(), req.query)
-            .filter()    // Lọc theo danh mục, thương hiệu, giá, thông số kỹ thuật
-            .search()    // Tìm kiếm full-text
-            .sort()      // Sắp xếp
-            .limitFields() // Chọn trường
-            .paginate(); // Phân trang
+            .filter()    
+            .search()    
+            .sort()      
+            .limitFields() 
+            .paginate(); 
 
-        // Đếm tổng số sản phẩm (để tính số trang)
         const totalFeatures = new ApiFeatures(Product.find(), req.query)
             .filter()
             .search();
@@ -31,7 +21,6 @@ exports.getProducts = async (req, res, next) => {
 
         const products = await features.query;
 
-        // Thông tin phân trang
         const { page, limit } = features.pagination;
         const totalPages = Math.ceil(total / limit);
 
@@ -49,10 +38,6 @@ exports.getProducts = async (req, res, next) => {
     }
 };
 
-// ============================================
-// LẤY CHI TIẾT 1 SẢN PHẨM
-// GET /api/products/:slug
-// ============================================
 exports.getProduct = async (req, res, next) => {
     try {
         const product = await Product.findOne({ slug: req.params.slug, isActive: true })
@@ -63,10 +48,9 @@ exports.getProduct = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
-        // Lấy sản phẩm liên quan (cùng danh mục)
         const relatedProducts = await Product.find({
             category: product.category,
-            _id: { $ne: product._id }, // Loại trừ sản phẩm hiện tại
+            _id: { $ne: product._id }, 
             isActive: true,
         })
             .limit(8)
@@ -81,28 +65,22 @@ exports.getProduct = async (req, res, next) => {
     }
 };
 
-// ============================================
-// TẠO SẢN PHẨM MỚI (Admin)
-// POST /api/products
-// ============================================
 exports.createProduct = async (req, res, next) => {
     try {
-        // Gắn admin tạo sản phẩm
+        
         req.body.createdBy = req.user.id;
 
-        // Nếu có file ảnh được upload từ Cloudinary
         if (req.file) {
             req.body.thumbnail = req.file.path;
         }
 
-        // --- XỬ LÝ THÔNG SỐ KỸ THUẬT (Dạng JSON string từ Admin gửi lên) ---
         if (req.body.specifications) {
             let specs = req.body.specifications;
-            // Parse cho đến khi nó là Object (phòng trường hợp bị stringify nhiều lần)
+            
             while (typeof specs === 'string') {
                 try {
                     specs = JSON.parse(specs);
-                    if (typeof specs !== 'object') break; // Nếu parse ra số hoặc null thì dừng
+                    if (typeof specs !== 'object') break; 
                 } catch (e) {
                     specs = {};
                     break;
@@ -123,10 +101,6 @@ exports.createProduct = async (req, res, next) => {
     }
 };
 
-// ============================================
-// CẬP NHẬT SẢN PHẨM (Admin)
-// PUT /api/products/:id
-// ============================================
 exports.updateProduct = async (req, res, next) => {
     try {
         let product = await Product.findById(req.params.id);
@@ -135,12 +109,10 @@ exports.updateProduct = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
-        // Nếu có file ảnh mới được upload
         if (req.file) {
             req.body.thumbnail = req.file.path;
         }
 
-        // --- XỬ LÝ THÔNG SỐ KỸ THUẬT (Dạng JSON string từ Admin gửi lên) ---
         if (req.body.specifications) {
             let specs = req.body.specifications;
             while (typeof specs === 'string') {
@@ -148,7 +120,7 @@ exports.updateProduct = async (req, res, next) => {
                     specs = JSON.parse(specs);
                     if (typeof specs !== 'object') break;
                 } catch (e) {
-                    break; // Giữ nguyên nếu lỗi nặng
+                    break; 
                 }
             }
             if (typeof specs === 'object' && specs !== null) {
@@ -156,10 +128,8 @@ exports.updateProduct = async (req, res, next) => {
             }
         }
 
-        // Cập nhật các trường thông tin từ req.body
         Object.assign(product, req.body);
 
-        // Lưu sản phẩm (hành động này sẽ kích hoạt validator và middleware .pre('save'))
         product = await product.save();
 
         res.status(200).json({
@@ -172,10 +142,6 @@ exports.updateProduct = async (req, res, next) => {
     }
 };
 
-// ============================================
-// XÓA SẢN PHẨM (Admin) - Xóa mềm
-// DELETE /api/products/:id
-// ============================================
 exports.deleteProduct = async (req, res, next) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -184,7 +150,6 @@ exports.deleteProduct = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
-        // Xóa mềm: Chỉ ẩn sản phẩm, không xóa khỏi DB
         product.isActive = false;
         await product.save();
 
@@ -197,10 +162,6 @@ exports.deleteProduct = async (req, res, next) => {
     }
 };
 
-// ============================================
-// THÊM ĐÁNH GIÁ SẢN PHẨM
-// POST /api/products/:id/reviews
-// ============================================
 exports.addReview = async (req, res, next) => {
     try {
         const { rating, title, comment } = req.body;
@@ -210,7 +171,6 @@ exports.addReview = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
-        // Kiểm tra user đã đánh giá chưa
         const alreadyReviewed = product.reviews.find(
             r => r.user.toString() === req.user.id.toString()
         );
@@ -218,7 +178,6 @@ exports.addReview = async (req, res, next) => {
             return next(new AppError('Bạn đã đánh giá sản phẩm này rồi.', 400));
         }
 
-        // Thêm đánh giá mới
         product.reviews.push({
             user: req.user.id,
             userName: req.user.fullName,
@@ -227,7 +186,6 @@ exports.addReview = async (req, res, next) => {
             comment,
         });
 
-        // Cập nhật rating trung bình
         product.calculateRating();
         await product.save();
 
@@ -241,11 +199,6 @@ exports.addReview = async (req, res, next) => {
     }
 };
 
-// ============================================
-// LẤY SẢN PHẨM NỔI BẬT / BÁN CHẠY
-// GET /api/products/featured
-// GET /api/products/best-sellers
-// ============================================
 exports.getFeaturedProducts = async (req, res, next) => {
     try {
         const products = await Product.find({ isFeatured: true, isActive: true })

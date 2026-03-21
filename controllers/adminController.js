@@ -1,16 +1,9 @@
-/**
- * ============================================
- * controllers/adminController.js - QUẢN TRỊ VIÊN
- * ============================================
- */
+
 
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
 
-// ============================================
-// ADMIN DASHBOARD - TỔNG QUAN THỐNG KÊ
-// ============================================
 exports.getDashboard = async (req, res, next) => {
     try {
         const today = new Date();
@@ -73,9 +66,6 @@ exports.getDashboard = async (req, res, next) => {
     }
 };
 
-// ============================================
-// DANH SÁCH SẢN PHẨM ADMIN
-// ============================================
 exports.getAdminProducts = async (req, res, next) => {
     try {
         const products = await Product.find().sort('-createdAt');
@@ -86,9 +76,6 @@ exports.getAdminProducts = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-// ============================================
-// DANH SÁCH ĐƠN HÀNG ADMIN
-// ============================================
 exports.getAdminOrders = async (req, res, next) => {
     try {
         const orders = await Order.find().sort('-createdAt').populate('user', 'firstName lastName phone');
@@ -99,9 +86,6 @@ exports.getAdminOrders = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-// ============================================
-// THÊM/SỬA SẢN PHẨM ADMIN (VIEW)
-// ============================================
 exports.getModifyProduct = async (req, res, next) => {
     try {
         let product = null;
@@ -115,9 +99,6 @@ exports.getModifyProduct = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-// ============================================
-// DANH SÁCH NGƯỜI DÙNG ADMIN
-// ============================================
 exports.getAdminUsers = async (req, res, next) => {
     try {
         const users = await User.find().sort('-createdAt');
@@ -128,9 +109,6 @@ exports.getAdminUsers = async (req, res, next) => {
     } catch (err) { next(err); }
 };
 
-// ============================================
-// KHÓA/MỞ KHÓA NGƯỜI DÙNG
-// ============================================
 exports.toggleUserStatus = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id);
@@ -138,7 +116,6 @@ exports.toggleUserStatus = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
         }
 
-        // Không cho phép tự khóa tài khoản của mình
         if (user._id.toString() === req.user._id.toString()) {
             return res.status(400).json({ success: false, message: 'Bạn không thể tự khóa tài khoản của chính mình' });
         }

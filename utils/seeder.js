@@ -1,10 +1,4 @@
-/**
- * ============================================
- * utils/seeder.js - DỮ LIỆU MẪU (SEED DATA)
- * ============================================
- * Chạy: npm run seed
- * Tự động tạo dữ liệu mẫu để test ứng dụng
- */
+
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -12,11 +6,8 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 const connectDB = require('../db');
 
-// ============================================
-// DỮ LIỆU MẪU SẢN PHẨM (ẢNH TỪ INTERNET)
-// ============================================
 const sampleProducts = [
-    // ---- LAPTOP ----
+    
     {
         name: 'ASUS ROG Zephyrus G16 2024',
         description: 'Laptop gaming cao cấp với màn hình OLED 240Hz, hiệu năng đỉnh cao',
@@ -62,7 +53,6 @@ const sampleProducts = [
         warranty: { months: 12, condition: 'Bảo hành chính hãng Apple' }
     },
 
-    // ---- CPU ----
     {
         name: 'Intel Core i9-14900K',
         description: 'Bộ vi xử lý flagship của Intel thế hệ 14',
@@ -83,7 +73,6 @@ const sampleProducts = [
         isNewArrival: true
     },
 
-    // ---- GPU ----
     {
         name: 'MSI GeForce RTX 4080 SUPER GAMING X SLIM',
         description: 'Card đồ họa RTX 4080 SUPER với 16GB GDDR6X',
@@ -103,7 +92,6 @@ const sampleProducts = [
         isNewArrival: true
     },
 
-    // ---- RAM ----
     {
         name: 'Kingston Fury Beast DDR5 32GB (2x16GB) 6000MHz',
         description: 'Bộ RAM DDR5 dung lượng 32GB',
@@ -124,7 +112,6 @@ const sampleProducts = [
     }
 ];
 
-// Admin user mẫu
 const sampleAdmin = {
     firstName: 'Admin',
     lastName: 'TechStore',
@@ -134,7 +121,6 @@ const sampleAdmin = {
     isActive: true,
 };
 
-// Hàm Seed Dữ Liệu
 const seedData = async () => {
     try {
         await connectDB();

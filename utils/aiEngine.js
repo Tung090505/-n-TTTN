@@ -1,18 +1,4 @@
-/**
- * ============================================
- * utils/aiEngine.js - AI ENGINE XÂY CẤU HÌNH PC
- * ============================================
- * Hệ thống AI gợi ý cấu hình máy tính thông minh.
- * 
- * Các thuật toán sử dụng:
- *   1. TF-IDF (Term Frequency - Inverse Document Frequency) → Phân tích văn bản
- *   2. Cosine Similarity → Đo độ tương đồng giữa mô tả và sản phẩm
- *   3. Weighted Scoring → Chấm điểm đa tiêu chí
- *   4. Compatibility Matrix → Kiểm tra tương thích phần cứng
- *   5. Greedy Optimization → Tối ưu phân bổ ngân sách
- * 
- * Dữ liệu training: Đọc từ trainingData.js + sản phẩm trong MongoDB
- */
+
 
 const Product = require('../models/Product');
 const {
@@ -24,9 +10,6 @@ const {
     AI_RESPONSES
 } = require('./trainingData');
 
-// ============================================
-// CÁC LINH KIỆN CẦN CHO MỘT BỘ PC
-// ============================================
 const PC_PARTS = ['cpu', 'gpu', 'ram', 'storage', 'motherboard', 'psu', 'case'];
 const PART_LABELS = {
     cpu: 'Bộ xử lý (CPU)',
@@ -38,14 +21,6 @@ const PART_LABELS = {
     case: 'Vỏ case'
 };
 
-// ============================================
-// THUẬT TOÁN 1: TF-IDF - PHÂN TÍCH VĂN BẢN
-// ============================================
-
-/**
- * Tách câu thành các từ (tokenize) và chuẩn hóa
- * Loại bỏ stopwords tiếng Việt
- */
 const STOPWORDS_VI = new Set([
     'tôi', 'cần', 'muốn', 'một', 'có', 'và', 'cho', 'với', 'để',
     'của', 'là', 'được', 'các', 'này', 'đó', 'như', 'hay', 'hoặc',
@@ -67,9 +42,6 @@ function tokenize(text) {
         .filter(w => w.length > 1 && !STOPWORDS_VI.has(w));
 }
 
-/**
- * Tính TF (Term Frequency) - Tần suất xuất hiện của từ trong văn bản
- */
 function computeTF(tokens) {
     const tf = {};
     const totalTokens = tokens.length;
@@ -79,7 +51,6 @@ function computeTF(tokens) {
         tf[token] = (tf[token] || 0) + 1;
     });
 
-    // Chuẩn hóa: chia cho tổng số từ
     Object.keys(tf).forEach(token => {
         tf[token] = tf[token] / totalTokens;
     });
@@ -87,14 +58,10 @@ function computeTF(tokens) {
     return tf;
 }
 
-/**
- * Tính IDF (Inverse Document Frequency) từ tập documents
- * IDF = log(N / df) với N = tổng documents, df = số documents chứa từ đó
- */
 function computeIDF(documents) {
     const idf = {};
     const N = documents.length;
-    const df = {}; // Document frequency
+    const df = {}; 
 
     documents.forEach(doc => {
         const uniqueTokens = new Set(doc);
@@ -104,15 +71,12 @@ function computeIDF(documents) {
     });
 
     Object.keys(df).forEach(token => {
-        idf[token] = Math.log(N / df[token]) + 1; // +1 để smooth
+        idf[token] = Math.log(N / df[token]) + 1; 
     });
 
     return idf;
 }
 
-/**
- * Tính TF-IDF vector cho một document
- */
 function computeTFIDF(tokens, idf) {
     const tf = computeTF(tokens);
     const tfidf = {};
@@ -124,14 +88,6 @@ function computeTFIDF(tokens, idf) {
     return tfidf;
 }
 
-// ============================================
-// THUẬT TOÁN 2: COSINE SIMILARITY
-// ============================================
-
-/**
- * Tính Cosine Similarity giữa 2 vector TF-IDF
- * cosine(A, B) = (A · B) / (||A|| * ||B||)
- */
 function cosineSimilarity(vecA, vecB) {
     const allKeys = new Set([...Object.keys(vecA), ...Object.keys(vecB)]);
 
@@ -154,15 +110,6 @@ function cosineSimilarity(vecA, vecB) {
     return dotProduct / (normA * normB);
 }
 
-// ============================================
-// THUẬT TOÁN 3: PHÂN TÍCH MÔ TẢ NGƯỜI DÙNG
-// (Dùng TF-IDF + Weighted Keywords)
-// ============================================
-
-/**
- * Phân tích mô tả người dùng bằng TF-IDF kết hợp PURPOSE_DICTIONARY
- * Trả về: mục đích, ngân sách, ưu tiên, confidence score
- */
 function analyzeDescription(description) {
     const text = description.toLowerCase().trim();
     const tokens = tokenize(text);
@@ -246,13 +193,11 @@ function analyzeDescription(description) {
         result.budget = defaultBudgets[result.purpose];
     }
 
-    // --- Bước 4: Xác định tier theo ngân sách ---
     if (result.budget <= 12000000) result.budgetTier = 'entry';
     else if (result.budget <= 25000000) result.budgetTier = 'mid';
     else if (result.budget <= 40000000) result.budgetTier = 'high';
     else result.budgetTier = 'ultra';
 
-    // --- Bước 5: Xác định ưu tiên ---
     if (text.match(/mạnh|cao cấp|high.?end|hiệu năng cao|flagship/)) {
         result.priorities.push('performance');
     }
@@ -269,11 +214,9 @@ function analyzeDescription(description) {
         result.priorities.push('quiet');
     }
 
-    // --- Bước 6: Chọn câu trả lời AI ---
     const responses = AI_RESPONSES.analysis[result.purpose] || AI_RESPONSES.analysis['hoc-tap'];
     result.aiResponse = responses[Math.floor(Math.random() * responses.length)];
 
-    // --- Bước 7: Nhận diện thương hiệu cụ thể ---
     const brands = ['apple', 'macbook', 'asus', 'msi', 'gigabyte', 'hp', 'dell', 'acer', 'lenovo', 'razer', 'intel', 'amd', 'nvidia'];
     result.requestedBrands = [];
     brands.forEach(brand => {
@@ -285,14 +228,6 @@ function analyzeDescription(description) {
     return result;
 }
 
-// ============================================
-// THUẬT TOÁN 4: TÌM BUILD TEMPLATE PHÙ HỢP NHẤT
-// ============================================
-
-/**
- * Tìm template phù hợp nhất dựa trên purpose + budget
- * Sử dụng Cosine Similarity giữa yêu cầu và template
- */
 function findBestTemplate(purpose, budget) {
     let bestTemplate = null;
     let bestScore = -1;
@@ -302,11 +237,10 @@ function findBestTemplate(purpose, budget) {
 
         let score = 0;
 
-        // Check budget nằm trong khoảng
         if (budget >= template.budgetRange.min && budget <= template.budgetRange.max) {
-            score += 50; // Match hoàn hảo
+            score += 50; 
         } else {
-            // Tính khoảng cách tới budget range (càng gần càng tốt)
+            
             const midBudget = (template.budgetRange.min + template.budgetRange.max) / 2;
             const distance = Math.abs(budget - midBudget) / midBudget;
             score += Math.max(0, 30 - distance * 30);
@@ -318,7 +252,6 @@ function findBestTemplate(purpose, budget) {
         }
     }
 
-    // Fallback: nếu không tìm được template cho purpose, dùng generic
     if (!bestTemplate) {
         bestTemplate = BUILD_TEMPLATES.find(t => t.purpose === 'gaming' && t.tier === 'mid');
     }
@@ -326,61 +259,43 @@ function findBestTemplate(purpose, budget) {
     return bestTemplate;
 }
 
-// ============================================
-// THUẬT TOÁN 5: WEIGHTED SCORING - CHẤM ĐIỂM SẢN PHẨM
-// ============================================
-
-/**
- * Chấm điểm sản phẩm dựa trên nhiều tiêu chí:
- * - Giá so với ngân sách (30%)
- * - Matching keywords với template (25%)
- * - Rating và số đánh giá (15%)
- * - Số lượng bán (10%)
- * - Performance score (15%)
- * - Khuyến mãi (5%)
- */
 function scoreProduct(product, budgetForPart, template, category, userTokens, idf) {
     const actualPrice = product.salePrice || product.price;
     let totalScore = 0;
     const scoreBreakdown = {};
 
-    // --- 1. Price Score (30 điểm) ---
     const priceRatio = actualPrice / budgetForPart;
     let priceScore = 0;
     if (priceRatio >= 0.7 && priceRatio <= 1.0) {
-        priceScore = 30; // Giá sát budget, tốt nhất
+        priceScore = 30; 
     } else if (priceRatio > 1.0 && priceRatio <= 1.3) {
-        priceScore = 30 - (priceRatio - 1) * 50; // Hơi vượt budget
+        priceScore = 30 - (priceRatio - 1) * 50; 
     } else if (priceRatio >= 0.5 && priceRatio < 0.7) {
-        priceScore = 20; // Rẻ hơn budget nhiều
+        priceScore = 20; 
     } else if (priceRatio > 1.3) {
-        priceScore = 5; // Quá đắt
+        priceScore = 5; 
     } else {
-        priceScore = 10; // Quá rẻ
+        priceScore = 10; 
     }
     scoreBreakdown.price = Math.max(0, priceScore);
     totalScore += scoreBreakdown.price;
 
-    // --- 2. Keyword Matching Score (25 điểm) ---
     let keywordScore = 0;
     if (template && template.idealSpecs[category]) {
         const idealSpec = template.idealSpecs[category];
         const productText = `${product.name} ${product.brand} ${JSON.stringify(product.specifications || {})}`.toLowerCase();
 
-        // Check brand
         if (idealSpec.brands && idealSpec.brands.length > 0) {
             if (idealSpec.brands.some(b => productText.includes(b.toLowerCase()))) {
                 keywordScore += 5;
             }
         }
 
-        // Check keywords
         if (idealSpec.keywords) {
             const matchCount = idealSpec.keywords.filter(k => productText.includes(k.toLowerCase())).length;
             keywordScore += Math.min(matchCount * 5, 15);
         }
 
-        // Check spec thresholds
         const specs = product.specifications || {};
         if (idealSpec.minCores && specs.cores >= idealSpec.minCores) keywordScore += 5;
         if (idealSpec.minVram && specs.vram >= idealSpec.minVram) keywordScore += 5;
@@ -390,17 +305,14 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
     scoreBreakdown.keyword = Math.min(keywordScore, 25);
     totalScore += scoreBreakdown.keyword;
 
-    // --- 3. Rating Score (15 điểm) ---
-    const ratingScore = (product.rating || 0) * 3; // 0-15
+    const ratingScore = (product.rating || 0) * 3; 
     scoreBreakdown.rating = Math.min(ratingScore, 15);
     totalScore += scoreBreakdown.rating;
 
-    // --- 4. Popularity Score (10 điểm) ---
     const soldScore = Math.min((product.sold || 0) / 10, 10);
     scoreBreakdown.popularity = soldScore;
     totalScore += scoreBreakdown.popularity;
 
-    // --- 5. Performance Score (15 điểm) ---
     let perfScore = 0;
     if (PERFORMANCE_SCORES[category]) {
         const productText = product.name.toLowerCase();
@@ -414,14 +326,12 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
     scoreBreakdown.performance = perfScore;
     totalScore += scoreBreakdown.performance;
 
-    // --- 6. TF-IDF Similarity với mô tả người dùng (bonus 15 điểm) ---
     if (userTokens && idf) {
         const productTokens = tokenize(`${product.name} ${product.description || ''} ${product.brand}`);
         const userVec = computeTFIDF(userTokens, idf);
         const productVec = computeTFIDF(productTokens, idf);
         const similarity = cosineSimilarity(userVec, productVec);
-        
-        // Bonus cực mạnh nếu user nhắc đến brand mà product này thuộc brand đó
+
         let brandBonus = 0;
         const userText = userTokens.join(' ');
         if (userText.includes(product.brand.toLowerCase())) {
@@ -434,7 +344,6 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
         totalScore += scoreBreakdown.textSimilarity;
     }
 
-    // --- 7. Sale Bonus (5 điểm) ---
     if (product.salePrice && product.salePrice < product.price) {
         const discount = ((product.price - product.salePrice) / product.price) * 100;
         scoreBreakdown.saleBonus = Math.min(discount / 10, 5);
@@ -448,14 +357,6 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
     };
 }
 
-// ============================================
-// THUẬT TOÁN 6: KIỂM TRA TƯƠNG THÍCH
-// ============================================
-
-/**
- * Kiểm tra tính tương thích giữa các linh kiện đã chọn
- * Trả về: { compatible: boolean, issues: [], warnings: [] }
- */
 function checkCompatibility(config) {
     const result = {
         compatible: true,
@@ -469,7 +370,6 @@ function checkCompatibility(config) {
         parts[part] = info.product;
     }
 
-    // Check 1: CPU Socket ↔ Motherboard
     if (parts.cpu && parts.motherboard) {
         const cpuSpecs = parts.cpu.specifications || {};
         const mbText = parts.motherboard.name.toLowerCase();
@@ -486,7 +386,6 @@ function checkCompatibility(config) {
         }
     }
 
-    // Check 2: RAM Type ↔ Motherboard
     if (parts.ram && parts.motherboard) {
         const ramSpecs = parts.ram.specifications || {};
         const ramType = ramSpecs.type;
@@ -503,7 +402,6 @@ function checkCompatibility(config) {
         }
     }
 
-    // Check 3: GPU Power ↔ PSU
     if (parts.gpu && parts.psu) {
         const gpuName = parts.gpu.name;
         const psuSpecs = parts.psu.specifications || {};
@@ -521,7 +419,6 @@ function checkCompatibility(config) {
         }
     }
 
-    // Cập nhật status
     if (result.issues.length > 0) {
         result.compatible = false;
         result.message = AI_RESPONSES.compatibility.issue;
@@ -532,16 +429,8 @@ function checkCompatibility(config) {
     return result;
 }
 
-// ============================================
-// HÀM TÌM SẢN PHẨM TỐT NHẤT (NÂNG CẤP)
-// ============================================
-
-/**
- * Tìm sản phẩm tốt nhất cho một category
- * Sử dụng Weighted Scoring + Template matching + TF-IDF
- */
 async function findBestProduct(category, budgetForPart, template, userTokens, idf, priorities = []) {
-    // Lấy sản phẩm từ database
+    
     const products = await Product.find({
         category: category,
         isActive: true,
@@ -553,11 +442,9 @@ async function findBestProduct(category, budgetForPart, template, userTokens, id
 
     if (products.length === 0) return null;
 
-    // Chấm điểm từng sản phẩm
     const scoredProducts = products.map(product => {
         const scoring = scoreProduct(product, budgetForPart, template, category, userTokens, idf);
 
-        // Bonus cho ưu tiên
         if (priorities.includes('budget-friendly')) {
             const actualPrice = product.salePrice || product.price;
             if (actualPrice <= budgetForPart) scoring.score += 5;
@@ -574,10 +461,8 @@ async function findBestProduct(category, budgetForPart, template, userTokens, id
         };
     });
 
-    // Sắp xếp theo điểm giảm dần
     scoredProducts.sort((a, b) => b.score - a.score);
 
-    // Trả về top 1
     const best = scoredProducts[0];
     return {
         product: best.product,
@@ -590,40 +475,30 @@ async function findBestProduct(category, budgetForPart, template, userTokens, id
     };
 }
 
-// ============================================
-// AI MODE: SINH CẤU HÌNH TỪ MÔ TẢ (NÂNG CẤP)
-// ============================================
-
 async function buildPCFromDescription(description) {
-    // Bước 1: Phân tích mô tả bằng TF-IDF + Weighted Keywords
+    
     const analysis = analyzeDescription(description);
 
-    // Bước 2: Tìm Build Template phù hợp nhất
     const template = findBestTemplate(analysis.purpose, analysis.budget);
 
-    // Bước 3: Lấy allocation từ template (hoặc fallback)
     const allocation = template ? template.budgetAllocation : {
         cpu: 0.22, gpu: 0.25, ram: 0.13, storage: 0.13,
         motherboard: 0.12, psu: 0.08, case: 0.07
     };
 
-    // Bước 4: Chuẩn bị TF-IDF cho text matching
     const userTokens = tokenize(description);
 
-    // Xây dựng IDF corpus từ tất cả sản phẩm
     const allProducts = await Product.find({ isActive: true })
         .select('name description brand');
     const documents = allProducts.map(p => tokenize(`${p.name} ${p.description || ''} ${p.brand}`));
-    documents.push(userTokens); // Thêm mô tả user vào corpus
+    documents.push(userTokens); 
     const idf = computeIDF(documents);
 
-    // Bước 5: Tìm sản phẩm theo thứ tự ưu tiên
     const config = {};
     let totalPrice = 0;
     const unavailableParts = [];
     let remainingBudget = analysis.budget;
 
-    // KIỂM TRA NẾU LÀ LAPTOP
     const isLaptopRequested = analysis.purpose === 'laptop' ||
         description.toLowerCase().includes('laptop') ||
         description.toLowerCase().includes('macbook') ||
@@ -670,7 +545,7 @@ async function buildPCFromDescription(description) {
                 totalParts: 1
             };
         } else {
-            // Trường hợp không tìm thấy laptop nào
+            
             return {
                 success: false,
                 message: `Rất tiếc, TechStore hiện không có mẫu Laptop nào phù hợp với ngân sách ${analysis.budget.toLocaleString('vi-VN')}đ của bạn. Bạn có thể thử tăng ngân sách hoặc đổi sang Build PC để bàn.`
@@ -709,10 +584,8 @@ async function buildPCFromDescription(description) {
         }
     }
 
-    // Bước 6: Kiểm tra tương thích
     const compatibility = checkCompatibility(config);
 
-    // Bước 7: Tạo response
     return {
         success: true,
         analysis: {
@@ -736,10 +609,6 @@ async function buildPCFromDescription(description) {
     };
 }
 
-// ============================================
-// HYBRID MODE: GỢI Ý TỪ LINH KIỆN ĐÃ CHỌN (NÂNG CẤP)
-// ============================================
-
 async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBudget = 20000000) {
     const template = findBestTemplate(purpose, totalBudget);
     const allocation = template ? template.budgetAllocation : {
@@ -747,7 +616,6 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
         motherboard: 0.12, psu: 0.08, case: 0.07
     };
 
-    // Bước 1: Lấy sản phẩm đã chọn
     const selectedProducts = {};
     let spentBudget = 0;
 
@@ -762,19 +630,17 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
                     actualPrice,
                     label: PART_LABELS[part],
                     isSelected: true,
-                    score: 100 // User choice = max score
+                    score: 100 
                 };
                 spentBudget += actualPrice;
             }
         }
     }
 
-    // Bước 2: Build IDF corpus
     const allProducts = await Product.find({ isActive: true }).select('name description brand');
     const documents = allProducts.map(p => tokenize(`${p.name} ${p.description || ''} ${p.brand}`));
     const idf = computeIDF(documents);
 
-    // Bước 3: Tìm sản phẩm cho các linh kiện còn lại
     const remainingBudget = Math.max(totalBudget - spentBudget, 0);
     const missingParts = PC_PARTS.filter(part => !selectedProducts[part]);
     const totalMissingWeight = missingParts.reduce((sum, part) => sum + (allocation[part] || 0.1), 0);
@@ -810,7 +676,6 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
         }
     }
 
-    // Bước 4: Gộp và check tương thích
     const fullConfig = { ...selectedProducts, ...suggestedProducts };
     const compatibility = checkCompatibility(fullConfig);
     const totalPrice = spentBudget + suggestedTotal;
@@ -833,10 +698,6 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
     };
 }
 
-// ============================================
-// HÀM HỖ TRỢ
-// ============================================
-
 async function getProductsByCategory(category) {
     return await Product.find({ category, isActive: true, stock: { $gt: 0 } })
         .sort({ rating: -1, sold: -1 })
@@ -855,9 +716,6 @@ async function getAllPartsForSelection() {
     return result;
 }
 
-// ============================================
-// EXPORTS
-// ============================================
 module.exports = {
     buildPCFromDescription,
     suggestRemainingParts,
@@ -867,7 +725,7 @@ module.exports = {
     checkCompatibility,
     PC_PARTS,
     PART_LABELS,
-    // Export để test riêng
+    
     tokenize,
     computeTF,
     computeIDF,

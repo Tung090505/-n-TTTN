@@ -1,20 +1,7 @@
-/**
- * ============================================
- * middleware/validate.js - MIDDLEWARE VALIDATION
- * ============================================
- * Sử dụng express-validator để kiểm tra
- * và làm sạch dữ liệu đầu vào (Input Sanitization)
- */
+
 
 const { body, param, query, validationResult } = require('express-validator');
 
-// ============================================
-// HÀM XỬ LÝ KẾT QUẢ VALIDATION
-// ============================================
-/**
- * Kiểm tra kết quả validation và trả về lỗi nếu có
- * Đặt middleware này sau các validation rules
- */
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
 
@@ -24,7 +11,6 @@ const handleValidationErrors = (req, res, next) => {
             message: err.msg,
         }));
 
-        // --- IN LOG LỖI RA TERMINAL ---
         console.log(`🔴 Validation Error:`, JSON.stringify(errorMessages, null, 2));
 
         return res.status(400).json({
@@ -37,15 +23,12 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// ============================================
-// VALIDATION RULES: XÁC THỰC NGƯỜI DÙNG
-// ============================================
 const validateRegister = [
     body('firstName')
         .trim()
         .notEmpty().withMessage('Tên không được để trống')
         .isLength({ max: 50 }).withMessage('Tên không được vượt quá 50 ký tự')
-        .escape(), // Chống XSS
+        .escape(), 
 
     body('lastName')
         .trim()
@@ -57,7 +40,7 @@ const validateRegister = [
         .trim()
         .notEmpty().withMessage('Email không được để trống')
         .isEmail().withMessage('Email không đúng định dạng')
-        .normalizeEmail(), // Chuẩn hóa email (lowercase, remove dots...)
+        .normalizeEmail(), 
 
     body('password')
         .notEmpty().withMessage('Mật khẩu không được để trống')
@@ -96,9 +79,6 @@ const validateLogin = [
     handleValidationErrors,
 ];
 
-// ============================================
-// VALIDATION RULES: SẢN PHẨM
-// ============================================
 const validateProduct = [
     body('name')
         .trim()
@@ -141,9 +121,6 @@ const validateProduct = [
     handleValidationErrors,
 ];
 
-// ============================================
-// VALIDATION RULES: ĐƠN HÀNG
-// ============================================
 const validateOrder = [
 
     body('shippingAddress.phone')
@@ -179,9 +156,6 @@ const validateOrder = [
     handleValidationErrors,
 ];
 
-// ============================================
-// VALIDATION RULES: QUERY PARAMETERS (bộ lọc)
-// ============================================
 const validateProductQuery = [
     query('minPrice')
         .optional()

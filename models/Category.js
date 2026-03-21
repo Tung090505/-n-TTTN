@@ -1,8 +1,4 @@
-/**
- * ============================================
- * models/Category.js - SCHEMA DANH MỤC
- * ============================================
- */
+
 
 const mongoose = require('mongoose');
 
@@ -16,7 +12,7 @@ const CategorySchema = new mongoose.Schema({
     },
     slug: { type: String, unique: true, lowercase: true },
     description: { type: String },
-    icon: { type: String },  // CSS class hoặc URL icon
+    icon: { type: String },  
     image: { type: String },
     parent: {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,10 +1,4 @@
-/**
- * ============================================
- * models/Cart.js - SCHEMA GIỎ HÀNG
- * ============================================
- * Quản lý giỏ hàng của người dùng
- * Tự động tính tổng tiền khi thay đổi
- */
+
 
 const mongoose = require('mongoose');
 
@@ -22,7 +16,7 @@ const CartItemSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true, // Lưu giá tại thời điểm thêm vào giỏ
+        required: true, 
     },
 }, { _id: false });
 
@@ -31,7 +25,7 @@ const CartSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        unique: true, // Mỗi user chỉ có 1 giỏ hàng
+        unique: true, 
     },
 
     items: {
@@ -39,7 +33,6 @@ const CartSchema = new mongoose.Schema({
         default: [],
     },
 
-    // Tổng tiền (tính tự động qua virtual)
     totalAmount: {
         type: Number,
         default: 0,
@@ -56,22 +49,11 @@ const CartSchema = new mongoose.Schema({
     toObject: { virtuals: true },
 });
 
-// ============================================
-// INSTANCE METHODS
-// ============================================
-
-/**
- * Cập nhật lại tổng tiền và số lượng sản phẩm trong giỏ
- */
 CartSchema.methods.updateTotals = function () {
     this.totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
     this.totalAmount = this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 };
 
-/**
- * Thêm sản phẩm vào giỏ hàng
- * Nếu đã có thì tăng số lượng
- */
 CartSchema.methods.addItem = function (productId, price, quantity = 1) {
     const existingItem = this.items.find(
         item => item.product.toString() === productId.toString()
@@ -86,9 +68,6 @@ CartSchema.methods.addItem = function (productId, price, quantity = 1) {
     this.updateTotals();
 };
 
-/**
- * Xóa sản phẩm khỏi giỏ hàng
- */
 CartSchema.methods.removeItem = function (productId) {
     this.items = this.items.filter(
         item => item.product.toString() !== productId.toString()
@@ -96,9 +75,6 @@ CartSchema.methods.removeItem = function (productId) {
     this.updateTotals();
 };
 
-/**
- * Cập nhật số lượng sản phẩm
- */
 CartSchema.methods.updateQuantity = function (productId, quantity) {
     const item = this.items.find(
         item => item.product.toString() === productId.toString()
@@ -114,9 +90,6 @@ CartSchema.methods.updateQuantity = function (productId, quantity) {
     }
 };
 
-/**
- * Xóa toàn bộ giỏ hàng (sau khi đặt hàng thành công)
- */
 CartSchema.methods.clearCart = function () {
     this.items = [];
     this.totalAmount = 0;

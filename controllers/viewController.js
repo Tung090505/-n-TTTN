@@ -1,23 +1,25 @@
-/**
- * ============================================
- * controllers/viewController.js - ĐIỀU HƯỚNG GIAO DIỆN
- * ============================================
- * Render các trang EJS thân thiện với người dùng
- */
+
 
 const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 const Order = require('../models/Order');
 const ApiFeatures = require('../utils/apiFeatures');
 
-// --- TRANG CHỦ ---
-exports.getHome = (req, res) => {
-    res.render('index', {
-        title: 'TechStore - Mua Laptop, PC & Linh Kiện Chính Hãng'
-    });
+exports.getHome = async (req, res, next) => {
+    try {
+        const featuredProducts = await Product.find({ isFeatured: true, isActive: true })
+            .limit(8)
+            .select('name slug thumbnail price salePrice rating numReviews brand');
+
+        res.render('index', {
+            title: 'TechStore - Mua Laptop, PC & Linh Kiện Chính Hãng',
+            featuredProducts
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
-// --- TRANG DANH SÁCH SẢN PHẨM ---
 exports.getProducts = async (req, res, next) => {
     try {
         const features = new ApiFeatures(Product.find(), req.query)
@@ -44,7 +46,6 @@ exports.getProducts = async (req, res, next) => {
     }
 };
 
-// --- TRANG CHI TIẾT SẢN PHẨM ---
 exports.getProductDetail = async (req, res, next) => {
     try {
         const product = await Product.findOne({ slug: req.params.slug, isActive: true })
@@ -70,7 +71,6 @@ exports.getProductDetail = async (req, res, next) => {
     }
 };
 
-// --- TRANG AUTH ---
 exports.getLogin = (req, res) => {
     if (req.user) return res.redirect('/');
     res.render('auth/login', { title: 'Đăng nhập | TechStore' });
@@ -81,7 +81,6 @@ exports.getRegister = (req, res) => {
     res.render('auth/register', { title: 'Đăng ký tài khoản | TechStore' });
 };
 
-// --- TRANG GIỎ HÀNG & THANH TOÁN ---
 exports.getCart = async (req, res, next) => {
     try {
         const cart = await Cart.findOne({ user: req.user.id }).populate('items.product');
@@ -108,7 +107,6 @@ exports.getCheckout = async (req, res, next) => {
     }
 };
 
-// --- QUẢN LÝ TÀI KHOẢN & ĐƠN HÀNG (USER) ---
 exports.getProfile = (req, res) => {
     res.render('profile', { title: 'Thông tin tài khoản | TechStore' });
 };
@@ -128,7 +126,7 @@ exports.getMyOrders = async (req, res, next) => {
 exports.getOrderDetail = async (req, res, next) => {
     try {
         const query = { orderCode: req.params.orderCode };
-        // Nếu không phải admin/staff thì chỉ xem đơn của chính mình
+        
         if (req.user.role !== 'admin' && req.user.role !== 'staff') {
             query.user = req.user.id;
         }
