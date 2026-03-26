@@ -74,88 +74,60 @@
             <!-- ============================================ -->
             <div id="panel-ai" class="p-8">
                 <div class="max-w-3xl mx-auto">
-                    <!-- Mô tả hướng dẫn -->
-                    <div
-                        class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8 border border-blue-100/50">
-                        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <span></span> Hướng dẫn
-                        </h3>
-                        <p class="text-sm text-slate-600 mb-3 font-bold">Dành cho Build PC để bàn:</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Tôi cần PC gaming ngân sách 30 triệu, chơi game 4K"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "PC đồ họa thiết kế, render video Premiere, tầm 25 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Máy tính văn phòng bền, tiết kiệm, budget 10 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "PC lập trình, chạy Docker, VS Code, ngân sách 20 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "PC Livestream chuyên nghiệp và làm YouTube, tầm 40 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-blue-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "PC cấu hình mạnh chạy Deep Learning, AI, tầm 50 triệu"
-                            </button>
-                        </div>
-
-                        <p class="text-sm text-slate-600 mb-3 font-bold">Dành cho tìm Laptop:</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Tôi muốn laptop gaming cấu hình mạnh, tầm 30 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Laptop văn phòng mỏng nhẹ, sang trọng, ngân sách 20 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Máy tính xách tay học tập giá rẻ cho sinh viên, tầm 12 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Laptop làm đồ họa chuyên nghiệp, màn hình chuẩn màu, tầm 35 triệu"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Tìm một chiếc máy tính xách tay mỏng nhẹ, pin trâu cho doanh nhân"
-                            </button>
-                            <button onclick="fillExample(this)"
-                                class="text-left bg-white/70 hover:bg-white p-3 rounded-xl border border-indigo-100 text-sm text-slate-600 transition-all hover:shadow-md cursor-pointer">
-                                "Macbook cấu hình mạnh để lập trình Mobile và iOS, tầm 45 triệu"
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Form nhập mô tả -->
-                    <div class="relative">
+                    <!-- 1. Form nhập mô tả (LÊN ĐẦU) -->
+                    <div class="relative mb-6">
                         <textarea id="ai-description"
-                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 pr-14 text-base focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"
-                            rows="4" placeholder="Mô tả nhu cầu sử dụng PC của bạn..."></textarea>
-                        <div class="absolute bottom-4 right-4 text-xs text-slate-400">
+                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 pr-14 text-lg focus:ring-8 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none shadow-inner"
+                            rows="3" placeholder="Ví dụ: Tôi cần PC gaming tầm 25 triệu..."></textarea>
+                        <div class="absolute bottom-6 right-6 text-xs text-slate-400">
                             <span id="char-count">0</span>/500
+                        </div>
+                        
+                        <!-- Dynamic Suggestion Flow -->
+                        <div id="suggestion-flow" class="mt-6 flex flex-wrap gap-2 items-center min-h-[40px]">
+                            <!-- Content generated by JS -->
                         </div>
                     </div>
 
                     <!-- Nút sinh cấu hình -->
                     <button id="btn-ai-build" onclick="aiGenerateConfig()"
-                        class="w-full mt-5 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.98] flex items-center justify-center gap-3 text-base">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        class="w-full mb-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black rounded-[2rem] hover:from-blue-700 hover:to-indigo-700 transition-all shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/30 active:scale-[0.98] flex items-center justify-center gap-4 text-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
-                        <span>Tạo cấu hình AI</span>
+                        <span>Tạo cấu hình AI ngay</span>
                     </button>
+
+                    <!-- 2. Mô tả hướng dẫn & Ví dụ (CHUYỂN XUỐNG DƯỚI) -->
+                    <div
+                        class="bg-gradient-to-r from-slate-50 to-blue-50/50 rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                        <h3 class="text-sm font-black text-slate-400 mb-6 uppercase tracking-widest flex items-center gap-2">
+                             Gợi ý nhu cầu cho bạn
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-[11px] font-black text-blue-600 uppercase mb-3 tracking-wider">Dành cho PC để bàn</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <button onclick="fillExample(this)" class="example-btn">"PC gaming 30 triệu, chơi game 4K"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"PC đồ họa Premiere, tầm 25 triệu"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"PC văn phòng, budget 10 triệu"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"PC lập trình Docker, tầm 20 triệu"</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-[11px] font-black text-indigo-600 uppercase mb-3 tracking-wider">Dành cho Laptop</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <button onclick="fillExample(this)" class="example-btn">"Laptop gaming mạnh, tầm 30 triệu"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"Laptop văn phòng sang trọng, 20 triệu"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"Laptop học tập sinh viên, 12 triệu"</button>
+                                    <button onclick="fillExample(this)" class="example-btn">"Macbook lập trình App, 45 triệu"</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -377,12 +349,89 @@
             updateCharCount();
         }
 
-        // --- Đếm ký tự ---
+        // --- Hệ thống gợi ý ngữ cảnh ---
+        function updateSmartSuggestions(text) {
+            const container = document.getElementById('suggestion-flow');
+            if (!container) return;
+
+            const val = text.toLowerCase();
+            let html = '';
+            
+            // Bước 1: Mục đích
+            if (!val || val === 'tôi cần') {
+                html = `
+                    <span class="chip-label">TÔI CẦN:</span>
+                    <button onclick="addKeyword('Gaming')" class="keyword-tag bg-blue-50 text-blue-600 border-blue-100">🎮 Gaming</button>
+                    <button onclick="addKeyword('Làm đồ họa')" class="keyword-tag bg-indigo-50 text-indigo-600 border-indigo-100">🎨 Đồ họa</button>
+                    <button onclick="addKeyword('Lập trình')" class="keyword-tag bg-emerald-50 text-emerald-600 border-emerald-100">💻 Lập trình</button>
+                    <button onclick="addKeyword('Dùng văn phòng')" class="keyword-tag bg-slate-100 text-slate-600 border-slate-200">📄 Văn phòng</button>
+                `;
+            } 
+            // Bước 2: Ngân sách
+            else if (val.includes('gaming') || val.includes('đồ họa') || val.includes('lập trình') || val.includes('văn phòng')) {
+                if (!val.includes('triệu')) {
+                    html = `
+                        <span class="chip-label">NGÂN SÁCH:</span>
+                        <button onclick="addKeyword('tầm 15 triệu')" class="keyword-tag">💰 ~15 triệu</button>
+                        <button onclick="addKeyword('tầm 25 triệu')" class="keyword-tag">💰 ~25 triệu</button>
+                        <button onclick="addKeyword('tầm 35 triệu')" class="keyword-tag">💰 ~35 triệu</button>
+                        <button onclick="addKeyword('trên 50 triệu')" class="keyword-tag">💰 > 50 triệu</button>
+                    `;
+                } else {
+                    html = `
+                        <span class="chip-label">ƯU TIÊN:</span>
+                        <button onclick="addKeyword('mượt')" class="keyword-tag text-emerald-600">⚡ Mượt</button>
+                        <button onclick="addKeyword('max setting')" class="keyword-tag text-orange-600">🔥 Max Setting</button>
+                        <button onclick="addKeyword('Intel Core i5')" class="keyword-tag">🔵 Intel i5</button>
+                        <button onclick="addKeyword('Ryzen 5')" class="keyword-tag">🔴 Ryzen 5</button>
+                        <button onclick="addKeyword('Card RTX 40')" class="keyword-tag">🟢 RTX 40</button>
+                    `;
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function addKeyword(text) {
+            const textarea = document.getElementById('ai-description');
+            const currentVal = textarea.value.trim();
+            
+            if (currentVal) {
+                // Kiểm tra xem từ đã có chưa để tránh lặp
+                if (!currentVal.toLowerCase().includes(text.toLowerCase())) {
+                    textarea.value = currentVal + ' ' + text.trim();
+                }
+            } else {
+                textarea.value = 'Tôi cần ' + text.trim();
+            }
+            
+            updateCharCount();
+            textarea.focus();
+        }
+
+        // --- Đếm ký tự và gợi ý ---
         function updateCharCount() {
             const val = document.getElementById('ai-description').value;
-            document.getElementById('char-count').innerText = val.length;
+            const charCountEl = document.getElementById('char-count');
+            if(charCountEl) charCountEl.innerText = val.length;
+            updateSmartSuggestions(val);
         }
-        document.getElementById('ai-description').addEventListener('input', updateCharCount);
+
+        // Lắng nghe sự kiện
+        document.addEventListener('DOMContentLoaded', () => {
+             const textarea = document.getElementById('ai-description');
+             if(textarea) {
+                textarea.addEventListener('input', updateCharCount);
+                textarea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        aiGenerateConfig();
+                    }
+                });
+             }
+             // Chạy lần đầu
+             updateSmartSuggestions('');
+        });
 
         // --- Hiện/Ẩn Loading ---
         function showLoading(text) {
@@ -729,5 +778,56 @@
 
         .active-tab {
             background-color: rgba(59, 130, 246, 0.03);
+        }
+
+        .example-btn {
+            text-align: left;
+            background-color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+            color: #475569;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .example-btn:hover {
+            background-color: #f8fafc;
+            border-color: #3b82f6;
+            color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .keyword-tag {
+            background-color: #f1f5f9;
+            color: #64748b;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .keyword-tag:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            transform: scale(1.05);
+        }
+
+        .keyword-tag:active {
+            transform: scale(0.95);
+        }
+
+        .chip-label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-right: 0.5rem;
         }
     </style>

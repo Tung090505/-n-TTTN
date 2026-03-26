@@ -302,6 +302,16 @@ const PURPOSE_DICTIONARY = {
             { word: 'card đồ họa mạnh', weight: 4 },
             { word: 'gpu mạnh', weight: 4 },
             { word: 'vga', weight: 2 },
+            { word: 'mượt', weight: 2 },
+            { word: 'max setting', weight: 5 },
+            { word: 'ultra setting', weight: 5 },
+            { word: 'độ phân giải cao', weight: 3 },
+            { word: 'vga rời', weight: 3 },
+            { word: 'vga khủng', weight: 4 },
+            { word: 'hiệu suất cao', weight: 3 },
+            { word: 'tản nhiệt', weight: 2 },
+            { word: 'rgb', weight: 2 },
+            { word: 'case kính', weight: 2 },
         ]
     },
     'do-hoa': {
@@ -451,35 +461,35 @@ const PRIORITY_ORDERS = {
 
 const PERFORMANCE_SCORES = {
     cpu: {
-        
-        'i3-12100': 45, 'i3-13100': 48,
+        // Intel
+        'i3-12100': 45, 'i3-13100': 48, 'i3-14100': 50,
         'i5-12400': 60, 'i5-12600K': 68,
-        'i5-13400': 63, 'i5-13600K': 72,
-        'i5-14400': 65, 'i5-14600K': 75,
-        'i7-12700': 75, 'i7-12700K': 78,
-        'i7-13700': 80, 'i7-13700K': 83,
-        'i7-14700': 82, 'i7-14700K': 85,
-        'i9-13900K': 92, 'i9-14900K': 95,
-        
+        'i5-13400': 63, 'i5-13500': 65, 'i5-13600K': 75,
+        'i5-14400': 66, 'i5-14600K': 78,
+        'i7-12700': 75, 'i7-13700': 82, 'i7-13700K': 85,
+        'i7-14700': 86, 'i7-14700K': 88,
+        'i9-13900K': 95, 'i9-14900K': 100,
+        // AMD
         'Ryzen 3 3200G': 35, 'Ryzen 3 4100': 40,
-        'Ryzen 5 5500': 55, 'Ryzen 5 5600': 58, 'Ryzen 5 5600X': 60,
-        'Ryzen 5 7600': 68, 'Ryzen 5 7600X': 70,
-        'Ryzen 7 5700X': 72, 'Ryzen 7 5800X': 75,
-        'Ryzen 7 7700X': 82, 'Ryzen 7 7800X3D': 88,
-        'Ryzen 9 5900X': 85, 'Ryzen 9 7900X': 90,
-        'Ryzen 9 7950X': 95,
+        'Ryzen 5 5500': 55, 'Ryzen 5 5600': 60, 'Ryzen 5 5600X': 62,
+        'Ryzen 5 7500F': 68, 'Ryzen 5 7600': 70, 'Ryzen 5 7600X': 72,
+        'Ryzen 7 5700X': 72, 'Ryzen 7 5800X': 75, 'Ryzen 7 5800X3D': 85,
+        'Ryzen 7 7700': 80, 'Ryzen 7 7700X': 82, 'Ryzen 7 7800X3D': 95,
+        'Ryzen 9 5900X': 85, 'Ryzen 9 7900X': 92, 'Ryzen 9 7950X': 98, 'Ryzen 9 7950X3D': 100,
     },
     gpu: {
-        'GT 1030': 10, 'GTX 1650': 30,
-        'RTX 3060': 55, 'RTX 3060 Ti': 60,
-        'RTX 4060': 62, 'RTX 4060 Ti': 70,
-        'RTX 4070': 78, 'RTX 4070 SUPER': 82,
-        'RTX 4070 Ti': 85, 'RTX 4070 Ti SUPER': 88,
-        'RTX 4080': 90, 'RTX 4080 SUPER': 92,
+        'GT 1030': 10, 'GTX 1650': 25, 'GTX 1660 Super': 35,
+        'RTX 3050': 40, 'RTX 3060': 55, 'RTX 3060 Ti': 62,
+        'RTX 4060': 65, 'RTX 4060 Ti': 72,
+        'RTX 3070': 70, 'RTX 3070 Ti': 75,
+        'RTX 4070': 82, 'RTX 4070 SUPER': 86,
+        'RTX 4070 Ti': 88, 'RTX 4070 Ti SUPER': 92,
+        'RTX 3080': 85, 'RTX 3080 Ti': 88, 'RTX 3090': 92, 'RTX 3090 Ti': 95,
+        'RTX 4080': 94, 'RTX 4080 SUPER': 96,
         'RTX 4090': 100,
-        'RX 7600': 55, 'RX 7700 XT': 72,
-        'RX 7800 XT': 80, 'RX 7900 XT': 88,
-        'RX 7900 XTX': 93,
+        'RX 6600': 48, 'RX 6700 XT': 65, 'RX 6800 XT': 78,
+        'RX 7600': 60, 'RX 7600 XT': 65, 'RX 7700 XT': 75,
+        'RX 7800 XT': 85, 'RX 7900 GRE': 88, 'RX 7900 XT': 92, 'RX 7900 XTX': 98,
     }
 };
 

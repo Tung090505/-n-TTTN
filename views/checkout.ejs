@@ -42,26 +42,26 @@
 
                         <div>
                             <h3 class="text-xl font-bold mb-6">Phương Thức Thanh Toán</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <label
-                                    class="p-6 rounded-2xl border-2 border-blue-600 bg-blue-50 cursor-pointer flex items-center gap-4">
-                                    <input type="radio" name="paymentMethod" value="cod" checked
-                                        class="w-5 h-5 text-blue-600">
-                                    <div>
-                                        <p class="font-bold text-slate-900">Thanh toán khi nhận hàng (COD)</p>
-                                        <p class="text-xs text-slate-500">Thanh toán bằng tiền mặt khi giao hàng</p>
-                                    </div>
-                                </label>
-                                <label
-                                    class="p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-200 cursor-pointer flex items-center gap-4 transition-all">
-                                    <input type="radio" name="paymentMethod" value="vnpay"
-                                        class="w-5 h-5 text-blue-600">
-                                    <div>
-                                        <p class="font-bold text-slate-900">Chuyển khoản / VNPAY</p>
-                                        <p class="text-xs text-slate-500">Thanh toán qua cổng VNPAY an toàn</p>
-                                    </div>
-                                </label>
-                            </div>
+                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                 <label
+                                     class="p-6 rounded-2xl border-2 border-blue-600 bg-blue-50 cursor-pointer flex items-center gap-4 transition-all group">
+                                     <input type="radio" name="paymentMethod" value="cod" checked
+                                         class="w-5 h-5 text-blue-600">
+                                     <div>
+                                         <p class="font-bold text-slate-900">Thanh toán khi nhận hàng (COD)</p>
+                                         <p class="text-xs text-slate-500">Thanh toán bằng tiền mặt khi giao hàng</p>
+                                     </div>
+                                 </label>
+                                 <label
+                                     class="p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-200 cursor-pointer flex items-center gap-4 transition-all group shadow-sm hover:shadow-md">
+                                     <input type="radio" name="paymentMethod" value="sepay"
+                                         class="w-5 h-5 text-blue-600">
+                                     <div>
+                                         <p class="font-bold text-slate-900">Thanh toán Qua SePay (VietQR)</p>
+                                         <p class="text-xs text-slate-500">Quét mã QR để thanh toán tự động</p>
+                                     </div>
+                                 </label>
+                             </div>
                         </div>
 
                         <button type="submit"
@@ -123,6 +123,30 @@
     </div>
 
     <script>
+        // Payment method toggle logic
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                document.querySelectorAll('input[name="paymentMethod"]').forEach(inner => {
+                    const label = inner.closest('label');
+                    label.classList.remove('border-blue-600', 'bg-blue-50', 'ring-4', 'ring-blue-500/5');
+                    label.classList.add('border-slate-100');
+                });
+                
+                if (e.target.checked) {
+                    const label = e.target.closest('label');
+                    label.classList.add('border-blue-600', 'bg-blue-50', 'ring-4', 'ring-blue-500/5');
+                    label.classList.remove('border-slate-100');
+                }
+            });
+
+            // Initialize state on page load
+            if (input.checked) {
+                const label = input.closest('label');
+                label.classList.add('border-blue-600', 'bg-blue-50', 'ring-4', 'ring-blue-500/5');
+                label.classList.remove('border-slate-100');
+            }
+        });
+
         document.getElementById('checkout-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -147,7 +171,7 @@
 
                 if (result.success) {
                     showToast('Đặt hàng thành công! Mã đơn: ' + result.data.order.orderCode, 'success');
-                    setTimeout(() => window.location.href = '/tai-khoan/don-hang', 2000);
+                    setTimeout(() => window.location.href = `/tai-khoan/don-hang/${result.data.order.orderCode}`, 2000);
                 } else {
                     showToast(result.message || 'Lỗi đặt hàng', 'error');
                 }

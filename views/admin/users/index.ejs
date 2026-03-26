@@ -9,12 +9,14 @@
                 <!-- MAIN CONTENT -->
                 <main class="flex-1">
                     <div class="glass p-10 rounded-[3rem] shadow-xl">
-                        <div class="flex items-center justify-between mb-10">
-                            <h2 class="text-3xl font-black text-slate-900">Quản Lý Người Dùng</h2>
-                            <div class="bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
-                                <span class="text-sm font-bold text-blue-600">Tổng cộng: <%= users.length %> khách
-                                        hàng</span>
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                            <div>
+                                <h2 class="text-3xl font-black text-slate-900">Quản Lý Người Dùng</h2>
+                                <p class="text-slate-400 font-medium">Quản lý và cấp quyền cho nhân viên của hệ thống</p>
                             </div>
+                            <button onclick="openStaffModal()" class="bg-slate-900 text-white px-8 py-4 rounded-3xl font-bold shadow-2xl hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2">
+                                ➕ Thêm Nhân Viên
+                            </button>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -25,7 +27,6 @@
                                         <th class="pb-6 px-4">Người dùng</th>
                                         <th class="pb-6 px-4">Liên hệ</th>
                                         <th class="pb-6 px-4">Ngày đăng ký</th>
-                                        <th class="pb-6 px-4">Trạng thái</th>
                                         <th class="pb-6 px-4 text-right">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -35,51 +36,48 @@
                                             <td class="py-6 px-4">
                                                 <div class="flex items-center gap-4">
                                                     <div
-                                                        class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 overflow-hidden">
+                                                        class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xl font-bold text-slate-400 overflow-hidden shadow-inner">
                                                         <img src="<%= user.avatar %>" alt="avatar"
                                                             class="w-full h-full object-cover">
                                                     </div>
                                                     <div>
                                                         <p class="font-bold text-slate-900">
-                                                            <%= user.lastName %>
-                                                                <%= user.firstName %>
+                                                            <%= user.lastName %> <%= user.firstName %>
                                                         </p>
-                                                        <span
-                                                            class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-500 font-black uppercase tracking-widest">
+                                                        <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest
+                                                            <%= user.role === 'admin' ? 'bg-indigo-100 text-indigo-600' : 
+                                                               user.role === 'staff' ? 'bg-amber-100 text-amber-600' : 
+                                                               'bg-slate-100 text-slate-500' %>">
                                                             <%= user.role %>
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="py-6 px-4">
-                                                <p class="text-sm text-slate-600 font-medium">
+                                                <p class="text-sm text-slate-600 font-medium tracking-tight">
                                                     <%= user.email %>
                                                 </p>
                                                 <p class="text-[11px] text-slate-400">
                                                     <%= user.phone || 'Chưa cập nhật' %>
                                                 </p>
                                             </td>
-                                            <td class="py-6 px-4">
+                                            <td class="py-6 px-4 whitespace-nowrap">
                                                 <p class="text-xs text-slate-500 font-medium">
                                                     <%= user.createdAt.toLocaleDateString('vi-VN') %>
                                                 </p>
                                             </td>
-                                            <td class="py-6 px-4">
-                                                <span id="status-<%= user._id %>"
-                                                    class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest <%= user.isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' %>">
-                                                    <%= user.isActive ? 'Đang hoạt động' : 'Đã bị khóa' %>
-                                                </span>
-                                            </td>
                                             <td class="py-6 px-4 text-right">
-                                                <% if (user.role !=='admin' ) { %>
-                                                    <button onclick="toggleUserStatus('<%= user._id %>')"
-                                                        class="toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all <%= user.isActive ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white' %>">
-                                                        <%= user.isActive ? 'Khóa tài khoản' : 'Mở khóa' %>
+                                                <% if (user.role !== 'admin') { %>
+                                                    <button onclick="toggleUserStatus('<%= user._id %>')" id="btn-<%= user._id %>"
+                                                        class="px-4 py-2 rounded-xl text-xs font-bold transition-all <%= user.isActive ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white' %>">
+                                                        <%= user.isActive ? 'Khóa tài khoản' : 'Kích hoạt' %>
                                                     </button>
-                                                    <% } %>
+                                                <% } else { %>
+                                                    <span class="text-[10px] text-slate-300 font-bold italic">Bảo vệ</span>
+                                                <% } %>
                                             </td>
                                         </tr>
-                                        <% }) %>
+                                    <% }) %>
                                 </tbody>
                             </table>
                         </div>
@@ -88,8 +86,74 @@
         </div>
     </div>
 
+    <!-- Staff Creation Modal -->
+    <div id="staff-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+        <div class="glass w-full max-w-md p-10 rounded-[3rem] shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h3 class="text-2xl font-black text-slate-900">Tạo Tài Khoản</h3>
+                    <p class="text-slate-400 font-medium text-sm">Cấp tài khoản nhân viên mới</p>
+                </div>
+                <button onclick="closeStaffModal()" class="text-slate-300 hover:text-slate-900 text-2xl transition-all">×</button>
+            </div>
+            <form id="staff-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Họ</label>
+                        <input type="text" name="lastName" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-slate-900">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Tên</label>
+                        <input type="text" name="firstName" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-slate-900">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Email</label>
+                    <input type="email" name="email" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-slate-900">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Mật khẩu</label>
+                    <input type="password" name="password" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-slate-900">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all mt-4">
+                    🚀 Lưu Thông Tin
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
+        const modal = document.getElementById('staff-modal');
+        const staffForm = document.getElementById('staff-form');
+
+        function openStaffModal() { modal.classList.remove('hidden'); }
+        function closeStaffModal() { modal.classList.add('hidden'); }
+
+        staffForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(staffForm);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const res = await fetch('/admin/nguoi-dung/staff', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi khi gửi yêu cầu', 'error');
+            }
+        };
+
         async function toggleUserStatus(id) {
+            const btn = document.getElementById(`btn-${id}`);
             try {
                 const res = await fetch(`/admin/nguoi-dung/${id}/toggle-status`, {
                     method: 'PUT',
@@ -99,22 +163,7 @@
 
                 if (result.success) {
                     showToast(result.message, 'success');
-
-                    // Cập nhật giao diện tại chỗ
-                    const statusSpan = document.getElementById(`status-${id}`);
-                    const btn = event.currentTarget;
-
-                    if (result.isActive) {
-                        statusSpan.innerText = 'Đang hoạt động';
-                        statusSpan.className = 'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600';
-                        btn.innerText = 'Khóa tài khoản';
-                        btn.className = 'toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-red-50 text-red-600 hover:bg-red-500 hover:text-white';
-                    } else {
-                        statusSpan.innerText = 'Đã bị khóa';
-                        statusSpan.className = 'px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600';
-                        btn.innerText = 'Mở khóa';
-                        btn.className = 'toggle-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white';
-                    }
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast(result.message, 'error');
                 }

@@ -4,6 +4,7 @@ const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 const Order = require('../models/Order');
 const ApiFeatures = require('../utils/apiFeatures');
+const { generateVietQR } = require('../utils/paymentUtils');
 
 exports.getHome = async (req, res, next) => {
     try {
@@ -134,9 +135,21 @@ exports.getOrderDetail = async (req, res, next) => {
         const order = await Order.findOne(query).populate('user', 'firstName lastName email phone');
         if (!order) return res.status(404).render('error', { statusCode: 404, title: 'Lỗi', message: 'Không tìm thấy đơn hàng.' });
 
+        let sepayQR = null;
+        if (order.paymentMethod === 'sepay' && order.paymentStatus === 'unpaid') {
+            sepayQR = generateVietQR(
+                process.env.SEPAY_BANK_NAME,
+                process.env.SEPAY_BANK_ACCOUNT,
+                process.env.SEPAY_BANK_OWNER,
+                order.totalAmount,
+                order.orderCode
+            );
+        }
+
         res.render('user/order-detail', {
             title: `Đơn hàng #${order.orderCode} | TechStore`,
-            order
+            order,
+            sepayQR
         });
     } catch (error) {
         next(error);

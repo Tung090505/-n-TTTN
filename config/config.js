@@ -61,7 +61,7 @@ module.exports = {
         COD: 'cod',            
         BANK: 'bank_transfer',  
         MOMO: 'momo',           
-        VNPAY: 'vnpay',          
+        SEPAY: 'sepay',
     },
 
     bcrypt: {

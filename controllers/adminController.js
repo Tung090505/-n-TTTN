@@ -130,3 +130,18 @@ exports.toggleUserStatus = async (req, res, next) => {
         });
     } catch (err) { next(err); }
 };
+
+exports.createStaff = async (req, res, next) => {
+    try {
+        const { firstName, lastName, email, phone, password } = req.body;
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ success: false, message: 'Email này đã được sử dụng' });
+        }
+        await User.create({
+            firstName, lastName, email, phone, password,
+            role: 'staff', isEmailVerified: true
+        });
+        res.status(201).json({ success: true, message: 'Đã tạo tài khoản nhân viên thành công!' });
+    } catch (err) { next(err); }
+};

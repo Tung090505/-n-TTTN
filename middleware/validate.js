@@ -150,7 +150,7 @@ const validateOrder = [
 
     body('paymentMethod')
         .notEmpty().withMessage('Phương thức thanh toán không được để trống')
-        .isIn(['cod', 'bank_transfer', 'momo', 'vnpay'])
+        .isIn(['cod', 'bank_transfer', 'momo', 'vnpay', 'sepay'])
         .withMessage('Phương thức thanh toán không hợp lệ'),
 
     handleValidationErrors,

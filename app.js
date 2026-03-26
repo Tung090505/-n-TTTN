@@ -26,6 +26,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const errorHandler = require('./middleware/errorHandler');
 
@@ -146,11 +147,15 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 app.use('/', viewRoutes);    
 app.use('/api/auth', authRoutes);    
+
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/api/chat', chatRoutes);
 app.use('/api/products', productRoutes); 
 app.use('/api/cart', cartRoutes);    
 app.use('/api/orders', orderRoutes);   
 app.use('/admin', adminRoutes);   
 app.use('/', aiRoutes);          
+app.use('/api/payment', paymentRoutes);
 
 app.use((req, res, next) => {
     const error = new Error(`Không tìm thấy trang: ${req.originalUrl}`);
@@ -160,12 +165,17 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
+
+const initSocket = require('./utils/socket');
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
     console.log(`🚀 TechStore Server đang chạy trên port ${PORT}`);
     console.log(`🌐 Truy cập: http://localhost:${PORT}`);
     console.log(`📅 Thời gian khởi động: ${new Date().toLocaleString('vi-VN')}`);
 });
+
+// Khởi tạo Socket.io
+initSocket(server);
 
 process.on('unhandledRejection', (err) => {
     console.error(`❌ Lỗi không được xử lý: ${err.message}`);
