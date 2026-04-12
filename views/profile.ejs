@@ -16,6 +16,14 @@
                     <p class="text-xs text-slate-400 font-medium uppercase tracking-widest mt-1">
                         <%= user.role %>
                     </p>
+                    <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest
+                        <%= user.membershipLevel === 'diamond' ? 'bg-indigo-100 text-indigo-700' : 
+                           user.membershipLevel === 'gold' ? 'bg-amber-100 text-amber-700' :
+                           user.membershipLevel === 'silver' ? 'bg-slate-200 text-slate-700' : 'bg-orange-100 text-orange-700' %>">
+                        <span class="mr-1">💎</span> <%= user.membershipLevel === 'diamond' ? 'Kim gương' : 
+                                       user.membershipLevel === 'gold' ? 'Vàng' :
+                                       user.membershipLevel === 'silver' ? 'Bạc' : 'Standard' %>
+                    </div>
                 </div>
 
                 <nav class="space-y-2">
@@ -37,7 +45,29 @@
             <!-- Main Content -->
             <main class="flex-1">
                 <div class="glass p-10 rounded-[3rem] shadow-xl">
-                    <h2 class="text-3xl font-black mb-8">Thông Tin Của Tôi</h2>
+                    <h2 class="text-3xl font-black mb-8 text-slate-900">Thông Tin Tài Khoản</h2>
+
+                    <!-- LOYALTY STATS GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+                        <div class="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
+                           <div class="absolute -right-4 -bottom-4 text-white/10 text-9xl font-black group-hover:scale-110 transition-transform">🪙</div>
+                           <p class="text-[10px] font-black uppercase tracking-widest text-white/70 mb-2">Điểm Tích Lũy</p>
+                           <p class="text-3xl font-black"><%= user.points || 0 %></p>
+                           <p class="text-[10px] mt-2 text-white/50">~ <%= ((user.points || 0) * 1000).toLocaleString('vi-VN') %>đ giảm giá</p>
+                        </div>
+                        <div class="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-slate-50 text-9xl font-black group-hover:scale-110 transition-transform">💳</div>
+                           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Tổng Chi Tiêu</p>
+                           <p class="text-3xl font-black text-slate-900"><%= (user.totalSpent || 0).toLocaleString('vi-VN') %>đ</p>
+                           <p class="text-[10px] mt-2 text-emerald-500 font-bold">Hạng: <%= user.membershipLevel?.toUpperCase() %></p>
+                        </div>
+                        <div class="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm relative overflow-hidden group">
+                            <div class="absolute -right-4 -bottom-4 text-slate-50 text-9xl font-black group-hover:scale-110 transition-transform">📦</div>
+                           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Đơn Hàng</p>
+                           <p class="text-3xl font-black text-slate-900"><%= user.totalOrders || 0 %></p>
+                           <p class="text-[10px] mt-2 text-slate-400">Đã hoàn thành</p>
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div class="space-y-6">
@@ -80,21 +110,156 @@
                                     </p>
                                     <% } else { %>
                                         <p class="text-sm text-slate-400 italic">Chưa có địa chỉ nào được lưu.</p>
-                                        <button class="mt-4 text-blue-600 font-bold text-sm hover:underline">+ Thêm địa
-                                            chỉ
-                                            mới</button>
-                                        <% } %>
+                                        <button id="add-address-btn" class="mt-4 text-blue-600 font-bold text-sm hover:underline">+ Thêm địa chỉ mới</button>
+                                    <% } %>
                         </div>
                     </div>
 
                     <div class="mt-12 pt-10 border-t border-slate-100 flex flex-wrap gap-4">
-                        <button
+                        <button id="edit-profile-btn"
                             class="px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all">Cập
                             nhật thông tin</button>
-                        <button
+                        <button id="change-password-btn"
                             class="px-8 py-4 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all">Đổi
                             mật khẩu</button>
                     </div>
+
+                    <!-- MODALS -->
+                    <!-- Edit Profile Modal -->
+                    <div id="edit-profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl">
+                            <h3 class="text-2xl font-black mb-6">Cập nhật thông tin</h3>
+                            <form id="edit-profile-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Họ</label>
+                                    <input type="text" name="lastName" value="<%= user.lastName %>" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Tên</label>
+                                    <input type="text" name="firstName" value="<%= user.firstName %>" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Số điện thoại</label>
+                                    <input type="tel" name="phone" value="<%= user.phone %>" class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                </div>
+                                <div class="flex gap-4 mt-8">
+                                    <button type="button" class="close-modal flex-1 py-4 font-bold text-slate-500">Hủy</button>
+                                    <button type="submit" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20">Lưu thay đổi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Modal -->
+                    <div id="change-password-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl">
+                            <h3 class="text-2xl font-black mb-6">Đổi mật khẩu</h3>
+                            <form id="change-password-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Mật khẩu hiện tại</label>
+                                    <input type="password" name="currentPassword" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Mật khẩu mới</label>
+                                    <input type="password" name="newPassword" required minlength="8" class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                </div>
+                                <div class="flex gap-4 mt-8">
+                                    <button type="button" class="close-modal flex-1 py-4 font-bold text-slate-500">Hủy</button>
+                                    <button type="submit" class="flex-1 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-lg">Cập nhật</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Add Address Modal -->
+                    <div id="add-address-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                        <div class="bg-white rounded-[2.5rem] w-full max-w-lg p-10 shadow-2xl">
+                            <h3 class="text-2xl font-black mb-6">Thêm địa chỉ mới</h3>
+                            <form id="add-address-form" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Họ tên nhận hàng</label>
+                                        <input type="text" name="fullName" required class="w-full px-6 py-4 rounded-2xl bg-slate-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Số điện thoại</label>
+                                        <input type="tel" name="phone" required class="w-full px-6 py-4 rounded-2xl bg-slate-100">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Đường / Số nhà</label>
+                                    <input type="text" name="street" required class="w-full px-6 py-4 rounded-2xl bg-slate-100">
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <input type="text" name="ward" placeholder="Phường/Xã" required class="px-4 py-4 rounded-2xl bg-slate-100">
+                                    <input type="text" name="district" placeholder="Quận/Huyện" required class="px-4 py-4 rounded-2xl bg-slate-100">
+                                    <input type="text" name="city" placeholder="Tỉnh/TP" required class="px-4 py-4 rounded-2xl bg-slate-100">
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer mt-4">
+                                    <input type="checkbox" name="isDefault" class="w-4 h-4 rounded text-blue-600">
+                                    <span class="text-sm font-bold text-slate-600">Đặt làm địa chỉ mặc định</span>
+                                </label>
+                                <div class="flex gap-4 mt-8">
+                                    <button type="button" class="close-modal flex-1 py-4 font-bold text-slate-500">Hủy</button>
+                                    <button type="submit" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg">Thêm mới</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <script>
+                        const modals = {
+                            profile: document.getElementById('edit-profile-modal'),
+                            password: document.getElementById('change-password-modal'),
+                            address: document.getElementById('add-address-modal')
+                        };
+
+                        function openModal(name) { modals[name].classList.remove('hidden'); modals[name].classList.add('flex'); }
+                        function closeAllModals() { Object.values(modals).forEach(m => { m.classList.add('hidden'); m.classList.remove('flex'); }); }
+
+                        document.getElementById('edit-profile-btn').onclick = () => openModal('profile');
+                        document.getElementById('change-password-btn').onclick = () => openModal('password');
+                        const addAddrBtn = document.getElementById('add-address-btn');
+                        if(addAddrBtn) addAddrBtn.onclick = () => openModal('address');
+
+                        document.querySelectorAll('.close-modal').forEach(btn => btn.onclick = closeAllModals);
+
+                        // Unified Submit Handler
+                        async function handleFormSubmit(formId, url, method = 'PUT') {
+                            const form = document.getElementById(formId);
+                            form.onsubmit = async (e) => {
+                                e.preventDefault();
+                                const formData = new FormData(form);
+                                const data = Object.fromEntries(formData.entries());
+                                if(data.isDefault) data.isDefault = form.isDefault.checked;
+
+                                try {
+                                    const res = await fetch(url, {
+                                        method,
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data)
+                                    });
+                                    const result = await res.json();
+                                    if(result.success) {
+                                        showToast(result.message, 'success');
+                                        setTimeout(() => window.location.reload(), 1000);
+                                    } else {
+                                        showToast(result.message || 'Có lỗi xảy ra', 'error');
+                                    }
+                                } catch (err) { showToast('Lỗi kết nối!', 'error'); }
+                            };
+                        }
+
+                        handleFormSubmit('edit-profile-form', '/api/auth/update-profile');
+                        handleFormSubmit('change-password-form', '/api/auth/change-password');
+                        handleFormSubmit('add-address-form', '/api/auth/address', 'POST');
+
+                        function showToast(msg, type) {
+                            // Simple toast if global one is not defined
+                            if(typeof window.showToast === 'function') return window.showToast(msg, type);
+                            alert(msg);
+                        }
+                    </script>
                 </div>
             </main>
         </div>

@@ -1,13 +1,11 @@
 <% layout('layouts/main') %>
 
-    <div class="container mx-auto px-6 py-10">
-        <div class="flex flex-col lg:flex-row gap-8">
+<div class="flex min-h-screen bg-slate-50">
+    <!-- Sidebar -->
+    <%- include('../../partials/admin-sidebar', { active: 'products' }) %>
 
-            <!-- SIDEBAR -->
-            <%- include('../../partials/admin-sidebar', { active: 'products' }) %>
-
-                <!-- MAIN CONTENT -->
-                <main class="flex-1">
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
                     <% const catMap={ 'laptop' : 'Laptop' , 'pc' : 'Máy tính bộ (PC)' , 'cpu' : 'Bộ vi xử lý (CPU)'
                         , 'gpu' : 'Card đồ họa (VGA)' , 'ram' : 'Bộ nhớ (RAM)' , 'storage' : 'Ổ cứng (SSD/HDD)'
                         , 'motherboard' : 'Bo mạch chủ' , 'psu' : 'Nguồn máy tính' , 'case' : 'Vỏ máy tính' , 'cooling'
@@ -119,8 +117,7 @@
                             </div>
                         </div>
                 </main>
-        </div>
-    </div>
+</div>
 
     <script>
         // Category Filter Logic

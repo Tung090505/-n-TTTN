@@ -8,11 +8,11 @@ const config = require('../config/config');
 const AddressSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     phone: { type: String, required: true },
-    street: { type: String, required: true },   
-    ward: { type: String, required: true },    
-    district: { type: String, required: true },    
-    city: { type: String, required: true },    
-    isDefault: { type: Boolean, default: false },   
+    street: { type: String, required: true },
+    ward: { type: String, required: true },
+    district: { type: String, required: true },
+    city: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
 }, { _id: true });
 
 const UserSchema = new mongoose.Schema({
@@ -52,7 +52,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Mật khẩu không được để trống'],
         minlength: [8, 'Mật khẩu phải có ít nhất 8 ký tự'],
-        select: false, 
+        select: false,
     },
 
     resetPasswordToken: { type: String, select: false },
@@ -66,7 +66,7 @@ const UserSchema = new mongoose.Schema({
 
     isActive: {
         type: Boolean,
-        default: true, 
+        default: true,
     },
 
     isEmailVerified: {
@@ -88,6 +88,15 @@ const UserSchema = new mongoose.Schema({
 
     totalOrders: { type: Number, default: 0 },
     totalSpent: { type: Number, default: 0 },
+
+    // Loyalty System
+    points: { type: Number, default: 0 },
+    membershipLevel: {
+        type: String,
+        enum: ['standard', 'silver', 'gold', 'diamond'],
+        default: 'standard',
+    },
+
     lastLoginAt: { type: Date },
 
 }, {
@@ -104,13 +113,13 @@ UserSchema.index({ phone: 1 });
 UserSchema.index({ role: 1 });
 
 UserSchema.pre('save', async function (next) {
-    
+
     if (!this.isModified('password')) {
         return next();
     }
 
     try {
-        
+
         const salt = await bcrypt.genSalt(config.bcrypt.saltRounds);
         this.password = await bcrypt.hash(this.password, salt);
         next();
@@ -139,6 +148,24 @@ UserSchema.methods.getSignedJwtToken = function () {
 
 UserSchema.methods.getDefaultAddress = function () {
     return this.addresses.find(addr => addr.isDefault) || this.addresses[0] || null;
+};
+
+// Generate and hash password token
+UserSchema.methods.getResetPasswordToken = function () {
+    const crypto = require('crypto');
+    // Generate token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // Hash token and set to resetPasswordToken field
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // Set expire (10 minutes)
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
 };
 
 module.exports = mongoose.model('User', UserSchema);

@@ -5,7 +5,28 @@
             <!-- LEFT: FORM THÔNG TIN -->
             <div class="lg:col-span-8">
                 <div class="glass p-10 rounded-[3rem] shadow-xl">
-                    <h2 class="text-3xl font-black mb-8">Thông Tin Giao Hàng</h2>
+                    <div class="mb-10">
+                        <h3 class="text-xl font-bold mb-6">Hình Thức Nhận Hàng</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="p-6 rounded-2xl border-2 border-blue-600 bg-blue-50 cursor-pointer flex items-center gap-4 transition-all group shadow-sm hover:shadow-md">
+                                <input type="radio" name="deliveryMethod" value="home_delivery" checked class="w-5 h-5 text-blue-600">
+                                <div>
+                                    <p class="font-bold text-slate-900">Giao hàng tận nơi 🏠</p>
+                                    <p class="text-[11px] text-slate-500">Giao đến địa chỉ của bạn (Phí: 30k hoặc Free > 5M)</p>
+                                </div>
+                            </label>
+                            <label class="p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-200 cursor-pointer flex items-center gap-4 transition-all group shadow-sm hover:shadow-md">
+                                <input type="radio" name="deliveryMethod" value="store_pickup" class="w-5 h-5 text-blue-600">
+                                <div>
+                                    <p class="font-bold text-slate-900">Nhận tại cửa hàng (O2O) 🏪</p>
+                                    <p class="text-[11px] text-slate-500">Đến TechStore gần nhất nhận hàng (Miễn phí ship)</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="shipping-address-section">
+                        <h2 class="text-3xl font-black mb-8">Thông Tin Giao Hàng</h2>
 
                     <form id="checkout-form" class="space-y-8">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -37,6 +58,7 @@
                                     class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
                             </div>
                         </div>
+                    </div>
 
                         <div class="h-px bg-slate-100 my-8"></div>
 
@@ -86,8 +108,7 @@
                                     <h4 class="text-sm font-bold text-slate-800 line-clamp-1">
                                         <%= item.product.name %>
                                     </h4>
-                                    <p class="text-[11px] text-slate-400">SL: <%= item.quantity %> x <%=
-                                                item.price.toLocaleString('vi-VN') %>đ</p>
+                                    <p class="text-[11px] text-slate-400">SL: <%= item.quantity %> x <%= item.price.toLocaleString('vi-VN') %>đ</p>
                                 </div>
                                 <span class="text-sm font-bold text-slate-900">
                                     <%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ
@@ -107,11 +128,50 @@
                         </div>
                         <div class="flex justify-between text-sm text-slate-500">
                             <span>Phí ship:</span>
-                            <span class="font-bold text-emerald-500">Miễn phí</span>
+                            <span id="shipping-fee-text" class="font-bold text-emerald-500">
+                                <%= (cart.totalAmount >= 5000000 || ['gold', 'diamond'].includes(user.membershipLevel)) ? 'Miễn phí' : '30.000đ' %>
+                            </span>
                         </div>
+
+                        <!-- TIER DISCOUNT DISPLAY -->
+                        <% if (user.membershipLevel !== 'standard') { %>
+                            <% const tierRates = { silver: 2, gold: 5, diamond: 10 }; %>
+                            <div class="flex justify-between text-sm text-blue-600 font-bold">
+                                <span>Ưu đãi hạng <%= user.membershipLevel.toUpperCase() %> (-<%= tierRates[user.membershipLevel] %>%):</span>
+                                <span id="tier-discount-text"></span>
+                            </div>
+                        <% } %>
+
+                        <!-- LOYALTY POINTS SECTION -->
+                        <div class="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 my-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-blue-800">Điểm tích lũy: <span class="text-blue-600"><%= user.points || 0 %> pts</span></span>
+                                <span class="text-[10px] text-slate-400">1 pt = 1.000đ</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="number" id="points-input" name="pointsUsed" min="0" max="<%= user.points || 0 %>" placeholder="Sử dụng điểm..."
+                                    class="w-full px-4 py-2 text-sm rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-500/20">
+                                <button type="button" id="apply-points-btn" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">Áp dụng</button>
+                            </div>
+                            <p id="points-discount-text" class="text-[10px] text-emerald-600 font-medium mt-1 hidden">- Giảm 0đ từ tích lũy</p>
+                        </div>
+
+                        <!-- COUPON SECTION -->
+                        <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 my-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-emerald-800">Mã giảm giá (Coupon):</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="coupon-input" placeholder="Nhập mã..."
+                                    class="w-full px-4 py-2 text-sm rounded-xl border-none outline-none focus:ring-2 focus:ring-emerald-500/20 uppercase">
+                                <button type="button" id="apply-coupon-btn" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">Áp dụng</button>
+                            </div>
+                            <p id="coupon-discount-text" class="text-[10px] text-emerald-600 font-medium mt-1 hidden">- Giảm 0đ từ mã KM</p>
+                        </div>
+
                         <div class="flex justify-between text-xl font-black pt-4 border-t border-slate-100">
                             <span>Tổng cộng:</span>
-                            <span class="text-blue-600">
+                            <span id="final-total-text" class="text-blue-600">
                                 <%= cart.totalAmount.toLocaleString('vi-VN') %>đ
                             </span>
                         </div>
@@ -123,6 +183,117 @@
     </div>
 
     <script>
+        const subtotal = Number('<%= cart.totalAmount || 0 %>');
+        const membershipLevel = '<%= user.membershipLevel %>';
+        const tierRates = { standard: 0, silver: 0.02, gold: 0.05, diamond: 0.1 };
+        
+        const tierRate = tierRates[membershipLevel] || 0;
+        const tierDiscount = Math.round(subtotal * tierRate);
+        
+        let shippingFee = (subtotal >= 5000000 || ['gold', 'diamond'].includes(membershipLevel)) ? 0 : 30000;
+        let currentPointsDiscount = 0;
+        let currentCouponDiscount = 0;
+        let appliedCouponCode = null;
+
+        function updateUI() {
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const finalShipping = deliveryMethod === 'store_pickup' ? 0 : shippingFee;
+            const finalTotal = subtotal + finalShipping - tierDiscount - currentPointsDiscount - currentCouponDiscount;
+
+            // Update Tier Discount text
+            const tdText = document.getElementById('tier-discount-text');
+            if (tdText) tdText.innerText = '-' + tierDiscount.toLocaleString('vi-VN') + 'đ';
+
+            document.getElementById('shipping-fee-text').innerText = finalShipping === 0 ? 'Miễn phí' : finalShipping.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('final-total-text').innerText = Math.max(0, finalTotal).toLocaleString('vi-VN') + 'đ';
+            
+            const addressSection = document.getElementById('shipping-address-section');
+            if (deliveryMethod === 'store_pickup') {
+                addressSection.style.display = 'none';
+                document.querySelectorAll('#shipping-address-section input').forEach(i => i.required = false);
+            } else {
+                addressSection.style.display = 'block';
+                document.querySelectorAll('#shipping-address-section input').forEach(i => i.required = true);
+            }
+        }
+
+        // Handle Delivery Method Toggle
+        document.querySelectorAll('input[name="deliveryMethod"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                document.querySelectorAll('input[name="deliveryMethod"]').forEach(inner => {
+                    const label = inner.closest('label');
+                    label.classList.remove('border-blue-600', 'bg-blue-50', 'ring-4', 'ring-blue-500/5');
+                    label.classList.add('border-slate-100');
+                });
+                if (e.target.checked) {
+                    const label = e.target.closest('label');
+                    label.classList.add('border-blue-600', 'bg-blue-50', 'ring-4', 'ring-blue-500/5');
+                    label.classList.remove('border-slate-100');
+                }
+                updateUI();
+            });
+        });
+
+        // Handle Points Application
+        document.getElementById('apply-points-btn').addEventListener('click', () => {
+            const pointsInput = document.getElementById('points-input');
+            const pointsVal = parseInt(pointsInput.value) || 0;
+            const maxPoints = Number('<%= user.points || 0 %>');
+            
+            if (pointsVal > maxPoints) {
+                showToast('Bạn chỉ có ' + maxPoints + ' điểm.', 'error');
+                return;
+            }
+
+            currentPointsDiscount = pointsVal * 1000;
+            const discountText = document.getElementById('points-discount-text');
+            discountText.innerText = '- Giảm ' + currentPointsDiscount.toLocaleString('vi-VN') + 'đ từ tích lũy';
+            discountText.classList.toggle('hidden', pointsVal === 0);
+            
+            updateUI();
+            showToast('Đã áp dụng ' + pointsVal + ' điểm tích lũy!', 'success');
+        });
+
+        // Handle Coupon Application
+        document.getElementById('apply-coupon-btn').addEventListener('click', async () => {
+            const codeInput = document.getElementById('coupon-input');
+            const code = codeInput.value.trim();
+            if (!code) {
+                showToast('Vui lòng nhập mã giảm giá.', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/coupons/validate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, orderAmount: subtotal })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    currentCouponDiscount = result.data.discount;
+                    appliedCouponCode = result.data.code;
+                    
+                    const discountText = document.getElementById('coupon-discount-text');
+                    discountText.innerText = '- Giảm ' + currentCouponDiscount.toLocaleString('vi-VN') + 'đ từ mã KM [' + appliedCouponCode + ']';
+                    discountText.classList.remove('hidden');
+                    
+                    updateUI();
+                    showToast('Áp dụng mã giảm giá thành công!', 'success');
+                } else {
+                    currentCouponDiscount = 0;
+                    appliedCouponCode = null;
+                    document.getElementById('coupon-discount-text').classList.add('hidden');
+                    updateUI();
+                    showToast(result.message || 'Mã không hợp lệ', 'error');
+                }
+            } catch (err) { 
+                console.error(err);
+                showToast('Lỗi kết nối máy chủ!', 'error'); 
+            }
+        });
+
         // Payment method toggle logic
         document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
             input.addEventListener('change', (e) => {
@@ -150,15 +321,21 @@
         document.getElementById('checkout-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const deliveryMethod = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            const pointsUsed = parseInt(document.getElementById('points-input').value) || 0;
+
             const data = {
-                shippingAddress: {
+                deliveryMethod,
+                pointsUsed,
+                couponCode: appliedCouponCode,
+                paymentMethod: formData.get('paymentMethod'),
+                shippingAddress: deliveryMethod === 'store_pickup' ? { phone: '0000000000', street: 'Store Pickup', ward: 'N/A', district: 'N/A', city: 'N/A' } : {
                     phone: formData.get('shippingAddress.phone'),
                     street: formData.get('shippingAddress.street'),
                     ward: formData.get('shippingAddress.ward'),
                     district: formData.get('shippingAddress.district'),
                     city: formData.get('shippingAddress.city'),
-                },
-                paymentMethod: formData.get('paymentMethod')
+                }
             };
 
             try {
@@ -177,4 +354,7 @@
                 }
             } catch (err) { showToast('Lỗi kết nối máy chủ!', 'error'); }
         });
+
+        // Initialize state
+        updateUI();
     </script>

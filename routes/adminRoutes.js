@@ -29,4 +29,10 @@ router.get('/nguoi-dung', ...adminOnly, adminController.getAdminUsers);
 router.post('/nguoi-dung/staff', ...adminOnly, adminController.createStaff);
 router.put('/nguoi-dung/:id/toggle-status', ...adminOnly, adminController.toggleUserStatus);
 
+// Quản lý Mã giảm giá - CHỈ ADMIN
+const couponController = require('../controllers/couponController');
+router.get('/ma-giam-gia', ...adminOnly, couponController.getAdminCoupons);
+router.post('/ma-giam-gia', ...adminOnly, couponController.createCoupon);
+router.put('/ma-giam-gia/:id/toggle-status', ...adminOnly, couponController.toggleCouponStatus);
+
 module.exports = router;

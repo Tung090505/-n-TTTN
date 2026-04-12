@@ -99,8 +99,8 @@
                                             <a href="/san-pham/<%= p.slug %>" class="block w-full h-full p-2">
                                                 <img src="<%= p.thumbnail %>" alt="<%= p.name %>" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500">
                                             </a>
-                                            <button class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-slate-300 hover:text-red-500 transition-all shadow-sm">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                            <button onclick="toggleWishlist('<%= p._id %>')" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-slate-300 hover:text-red-500 transition-all shadow-sm <%= (user && user.wishlist && user.wishlist.some(id => id.toString() === p._id.toString())) ? 'opacity-100 text-red-500' : '' %>">
+                                                <svg class="w-3.5 h-3.5" fill="<%= (user && user.wishlist && user.wishlist.some(id => id.toString() === p._id.toString())) ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                                             </button>
                                         </div>
 
@@ -148,6 +148,33 @@
     </div>
 
     <script>
+        async function toggleWishlist(id) {
+            try {
+                const res = await fetch(`/api/auth/wishlist/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // Toggle appearance locally
+                    const btn = event.currentTarget;
+                    const svg = btn.querySelector('svg');
+                    if (data.message.includes('thêm')) {
+                        btn.classList.add('text-red-500');
+                        btn.classList.add('opacity-100');
+                        svg.setAttribute('fill', 'currentColor');
+                    } else {
+                        btn.classList.remove('text-red-500');
+                        btn.classList.remove('opacity-100');
+                        svg.setAttribute('fill', 'none');
+                    }
+                } else {
+                    showToast(data.message || 'Vui lòng đăng nhập!', 'error');
+                }
+            } catch (err) { console.error(err); }
+        }
+
         async function addToCart(id) {
             try {
                 const res = await fetch('/api/cart/add', {

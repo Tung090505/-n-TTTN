@@ -198,10 +198,10 @@ function analyzeDescription(description) {
     else if (result.budget <= 40000000) result.budgetTier = 'high';
     else result.budgetTier = 'ultra';
 
-    if (text.match(/mạnh|cao cấp|high.?end|hiệu năng cao|flagship/)) {
+    if (text.match(/mạnh|cao cấp|high.?end|hiệu năng cao|flagship|máy khỏe|cấu hình tốt/)) {
         result.priorities.push('performance');
     }
-    if (text.match(/rẻ|tiết kiệm|giá rẻ|bình dân|budget|phải chăng/)) {
+    if (text.match(/rẻ|tiết kiệm|giá rẻ|bình dân|budget|phải chăng|giá tốt/)) {
         result.priorities.push('budget-friendly');
     }
     if (text.match(/bền|ổn định|lâu dài|bảo hành|tin cậy/)) {
@@ -217,9 +217,25 @@ function analyzeDescription(description) {
     const responses = AI_RESPONSES.analysis[result.purpose] || AI_RESPONSES.analysis['hoc-tap'];
     result.aiResponse = responses[Math.floor(Math.random() * responses.length)];
 
+    const hardwarePatterns = [
+        'rtx 4090', 'rtx 4080', 'rtx 4070', 'rtx 4060', 'rtx 40',
+        'rtx 3090', 'rtx 3080', 'rtx 3070', 'rtx 3060', 'rtx 3050', 'rtx 30',
+        'gtx 1660', 'gtx 1650', 'gtx 1050', 'gtx',
+        'rx 7900', 'rx 7800', 'rx 7700', 'rx 7600', 'rx 7000',
+        'rx 6900', 'rx 6800', 'rx 6700', 'rx 6600', 'rx 6000',
+        'i9', 'i7', 'i5', 'i3',
+        'ryzen 9', 'ryzen 7', 'ryzen 5', 'ryzen 3'
+    ];
+    result.detectedDeviceModels = [];
+    hardwarePatterns.forEach(model => {
+        if (text.includes(model)) {
+            result.detectedDeviceModels.push(model);
+        }
+    });
+
     const brands = ['apple', 'macbook', 'asus', 'msi', 'gigabyte', 'hp', 'dell', 'acer', 'lenovo', 'razer', 'intel', 'amd', 'nvidia'];
     result.requestedBrands = [];
-    brands.forEach(brand => {
+     brands.forEach(brand => {
         if (text.includes(brand)) {
             result.requestedBrands.push(brand);
         }
@@ -348,6 +364,29 @@ function scoreProduct(product, budgetForPart, template, category, userTokens, id
         const discount = ((product.price - product.salePrice) / product.price) * 100;
         scoreBreakdown.saleBonus = Math.min(discount / 10, 5);
         totalScore += scoreBreakdown.saleBonus;
+    }
+
+    // --- Bonus đặc biệt: Khớp trực tiếp mã linh kiện người dùng yêu cầu ---
+    if (userTokens && userTokens.length > 0) {
+        const fullDesc = userTokens.join(' ').toLowerCase();
+        let hardwareMatchBonus = 0;
+        const productNameLower = product.name.toLowerCase();
+
+        const hardwareModels = [
+            'rtx 4090', 'rtx 4080', 'rtx 4070', 'rtx 4060', 'rtx 40',
+            'rtx 3090', 'rtx 3080', 'rtx 3070', 'rtx 3060', 'rtx 30',
+            'gtx 1660', 'gtx 1650', 'i9', 'i7', 'i5', 'i3',
+            'ryzen 9', 'ryzen 7', 'ryzen 5', 'ryzen 3'
+        ];
+
+        for (const model of hardwareModels) {
+            if (fullDesc.includes(model) && productNameLower.includes(model)) {
+                hardwareMatchBonus = 50; // Bonus cực mạnh để ghi đè các yếu tố khác
+                break;
+            }
+        }
+        scoreBreakdown.hardwareMatch = hardwareMatchBonus;
+        totalScore += hardwareMatchBonus;
     }
 
     return {

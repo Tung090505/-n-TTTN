@@ -38,6 +38,11 @@
             <span class="flex items-center gap-3">👥 Quản lý Người dùng</span>
             <% if(active==='users' ) { %> <span class="text-xs opacity-50">→</span><% } %>
         </a>
+        <a href="/admin/ma-giam-gia"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'coupons' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">🏷️ Quản lý Mã giảm giá</span>
+            <% if(active==='coupons' ) { %> <span class="text-xs opacity-50">→</span><% } %>
+        </a>
         <% } %>
     </nav>
 </aside>

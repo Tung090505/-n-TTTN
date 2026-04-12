@@ -21,6 +21,8 @@ exports.getDashboard = async (req, res, next) => {
             lowStockProducts,
             totalUsers,
             newUsersThisMonth,
+            diamondUsers,
+            totalPointsData,
             recentOrders,
             topProducts
         ] = await Promise.all([
@@ -33,6 +35,8 @@ exports.getDashboard = async (req, res, next) => {
             Product.countDocuments({ isActive: true, stock: { $lt: 10 } }),
             User.countDocuments({ role: 'customer' }),
             User.countDocuments({ role: 'customer', createdAt: { $gte: thisMonth } }),
+            User.countDocuments({ membershipLevel: 'diamond' }),
+            User.aggregate([{ $group: { _id: null, total: { $sum: '$points' } } }]),
             Order.find().sort('-createdAt').limit(6).populate('user', 'firstName lastName'),
             Product.find({ isActive: true }).sort('-sold').limit(5)
         ]);
@@ -52,7 +56,9 @@ exports.getDashboard = async (req, res, next) => {
             totalProducts,
             lowStockProducts,
             totalUsers,
-            newUsersThisMonth
+            newUsersThisMonth,
+            diamondUsers,
+            totalPoints: totalPointsData[0]?.total || 0
         };
 
         res.render('admin/dashboard', {

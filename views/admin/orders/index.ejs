@@ -1,13 +1,11 @@
 <% layout('layouts/main') %>
 
-    <div class="container mx-auto px-6 py-10">
-        <div class="flex flex-col lg:flex-row gap-8">
+<div class="flex min-h-screen bg-slate-50">
+    <!-- Sidebar -->
+    <%- include('../../partials/admin-sidebar', { active: 'orders' }) %>
 
-            <!-- SIDEBAR -->
-            <%- include('../../partials/admin-sidebar', { active: 'orders' }) %>
-
-                <!-- MAIN CONTENT -->
-                <main class="flex-1">
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
                     <div class="glass p-10 rounded-[3rem] shadow-xl">
                         <h2 class="text-3xl font-black text-slate-900 mb-10">Quản Lý Đơn Hàng</h2>
 
@@ -83,8 +81,7 @@
                         </div>
                     </div>
                 </main>
-        </div>
-    </div>
+</div>
 
     <script>
         async function updateStatus(code, status) {
@@ -96,7 +93,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('Cập nhật thành công! ✨', 'success');
+                    showToast('Cập nhật thành công!', 'success');
                 } else {
                     showToast(data.message, 'error');
                 }

@@ -165,6 +165,10 @@
                                 class="flex-1 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/25 transition-all text-lg flex items-center justify-center gap-3">
                                 <span>🛒 Thêm vào giỏ hàng</span>
                             </button>
+                            <button onclick="toggleWishlist('<%= product._id %>')"
+                                class="w-[72px] h-[72px] flex items-center justify-center rounded-2xl border-2 border-slate-100 hover:border-red-200 hover:bg-red-50 transition-all group <%= (user && user.wishlist && user.wishlist.some(id => id.toString() === product._id.toString())) ? 'bg-red-50 border-red-200 text-red-500' : 'text-slate-400' %>">
+                                <svg class="w-7 h-7" fill="<%= (user && user.wishlist && user.wishlist.some(id => id.toString() === product._id.toString())) ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
                         </div>
 
                     </div>
@@ -255,7 +259,7 @@
                                 </p>
                             </div>
 
-                            <% if (user) { %>
+                            <% if (user && hasPurchased) { %>
                                 <div class="glass p-8 rounded-[2.5rem] mt-6">
                                     <h4 class="font-bold mb-4 text-slate-900">Viết đánh giá</h4>
                                     <form id="review-form" class="space-y-4">
@@ -276,6 +280,20 @@
                                             đánh giá</button>
                                     </form>
                                 </div>
+                            <% } else if (user && !hasPurchased) { %>
+                                    <div class="glass p-6 rounded-[2.5rem] mt-6 bg-blue-50/50 border border-blue-100">
+                                        <p class="text-xs font-bold text-blue-600 flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            Bạn cần mua sản phẩm này để có thể đánh giá.
+                                        </p>
+                                    </div>
+                                <% } else { %>
+                                    <div class="glass p-6 rounded-[2.5rem] mt-6 bg-slate-50 border border-slate-100">
+                                        <p class="text-xs font-bold text-slate-500 flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                            Vui lòng <a href="/dang-nhap" class="text-blue-600 underline">đăng nhập</a> để đánh giá sản phẩm.
+                                        </p>
+                                    </div>
                                 <% } %>
                         </div>
 
@@ -355,6 +373,45 @@
     </div>
 
     <script>
+        async function toggleWishlist(id) {
+            try {
+                const res = await fetch(`/api/auth/wishlist/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    const btn = event.currentTarget;
+                    const svg = btn.querySelector('svg');
+                    if (data.message.includes('thêm')) {
+                        btn.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
+                        btn.classList.remove('text-slate-400');
+                        svg.setAttribute('fill', 'currentColor');
+                    } else {
+                        btn.classList.remove('text-red-500', 'bg-red-50', 'border-red-200');
+                        btn.classList.add('text-slate-400');
+                        svg.setAttribute('fill', 'none');
+                    }
+                } else {
+                    showToast(data.message || 'Vui lòng đăng nhập!', 'error');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#reviews-tab') switchTab('reviews');
+        });
+
+        window.addEventListener('load', () => {
+            if (window.location.hash === '#reviews-tab') {
+                switchTab('reviews');
+                setTimeout(() => {
+                    document.getElementById('reviews-tab').scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            }
+        });
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(t => {
                 t.classList.remove('text-blue-600', 'border-blue-600', 'border-b-4');
@@ -388,7 +445,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('Đã thêm sản phẩm vào giỏ hàng! ⚡', 'success');
+                    showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast(data.message || 'Vui lòng đăng nhập!', 'error');
@@ -426,7 +483,7 @@
                     });
                     const result = await res.json();
                     if (result.success) {
-                        showToast('Cảm ơn bạn đã đánh giá! ✨', 'success');
+                        showToast('Cảm ơn bạn đã đánh giá!', 'success');
                         setTimeout(() => window.location.reload(), 1500);
                     } else {
                         showToast(result.message, 'error');

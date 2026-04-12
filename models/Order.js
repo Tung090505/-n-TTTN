@@ -39,6 +39,8 @@ const OrderSchema = new mongoose.Schema({
     subtotal: { type: Number, required: true }, 
     shippingFee: { type: Number, default: 0 },      
     discount: { type: Number, default: 0 },      
+    tierDiscount: { type: Number, default: 0 }, // Discount based on membership level (Silver/Gold/Diamond)
+    membershipLevelAtPurchase: { type: String },
     totalAmount: { type: Number, required: true },  
 
     couponCode: { type: String },
@@ -61,6 +63,15 @@ const OrderSchema = new mongoose.Schema({
         enum: ['cod', 'bank_transfer', 'momo', 'vnpay', 'sepay'],
         default: 'cod',
     },
+
+    deliveryMethod: {
+        type: String,
+        enum: ['home_delivery', 'store_pickup'],
+        default: 'home_delivery',
+    },
+
+    pointsUsed: { type: Number, default: 0 },
+    pointsEarned: { type: Number, default: 0 },
 
     paymentStatus: {
         type: String,
@@ -110,7 +121,17 @@ OrderSchema.pre('save', function (next) {
     }
 
     this.subtotal = this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    this.totalAmount = this.subtotal + this.shippingFee - this.discount;
+    
+    // O2O Logistics: Free shipping if pick up at store
+    if (this.deliveryMethod === 'store_pickup') {
+        this.shippingFee = 0;
+    }
+
+    // Loyalty: 1 point = 1,000 VND discount
+    const pointDiscount = (this.pointsUsed || 0) * 1000;
+    
+    this.totalAmount = this.subtotal + this.shippingFee - this.discount - this.tierDiscount - pointDiscount;
+    if (this.totalAmount < 0) this.totalAmount = 0;
 
     next();
 });

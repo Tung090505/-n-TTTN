@@ -7,7 +7,14 @@ const { AppError } = require('../middleware/errorHandler');
 
 exports.createOrder = async (req, res, next) => {
     try {
-        const { shippingAddress, paymentMethod, customerNote } = req.body;
+        const { shippingAddress, paymentMethod, customerNote, deliveryMethod, pointsUsed } = req.body;
+        
+        const User = require('../models/User');
+        const user = await User.findById(req.user.id);
+
+        if (pointsUsed > user.points) {
+            return next(new AppError('Bạn không có đủ điểm tích lũy.', 400));
+        }
 
         const cart = await Cart.findOne({ user: req.user.id })
             .populate('items.product');
@@ -54,20 +61,65 @@ exports.createOrder = async (req, res, next) => {
             shippingAddress.fullName = `${req.user.lastName} ${req.user.firstName}`;
         }
 
+        // O2O Logistics & Loyalty Ship: Free shipping if pick up at store OR if Gold/Diamond member
+        if (deliveryMethod === 'store_pickup' || ['gold', 'diamond'].includes(user.membershipLevel)) {
+            shippingFee = 0;
+        }
+
+        // Tier Percentage Discount
+        const tierDiscountRates = { standard: 0, silver: 0.02, gold: 0.05, diamond: 0.1 };
+        const tierRate = tierDiscountRates[user.membershipLevel] || 0;
+        const tierDiscount = Math.round(subtotal * tierRate);
+
+        // Coupons
+        let couponDiscount = 0;
+        let couponId = null;
+        if (req.body.couponCode) {
+            const Coupon = require('../models/Coupon');
+            const coupon = await Coupon.findOne({ code: req.body.couponCode.toUpperCase() });
+            if (coupon && coupon.isValid() && subtotal >= coupon.minOrderAmount) {
+                if (coupon.discountType === 'percent') {
+                    couponDiscount = Math.round(subtotal * (coupon.discountAmount / 100));
+                    if (coupon.maxDiscountAmount && couponDiscount > coupon.maxDiscountAmount) {
+                        couponDiscount = coupon.maxDiscountAmount;
+                    }
+                } else {
+                    couponDiscount = coupon.discountAmount;
+                }
+                couponId = coupon._id;
+                coupon.usedCount += 1;
+                await coupon.save();
+            }
+        }
+
         const order = await Order.create({
             user: req.user.id,
             items: orderItems,
             subtotal,
             shippingFee,
-            totalAmount: subtotal + shippingFee,
-            shippingAddress,
+            tierDiscount,
+            discount: couponDiscount,
+            couponCode: req.body.couponCode?.toUpperCase(),
+            couponId,
+            membershipLevelAtPurchase: user.membershipLevel,
+            totalAmount: subtotal + shippingFee - tierDiscount - couponDiscount - (pointsUsed || 0) * 1000,
+            shippingAddress: deliveryMethod === 'store_pickup' ? undefined : shippingAddress,
             paymentMethod,
             customerNote,
+            deliveryMethod: deliveryMethod || 'home_delivery',
+            pointsUsed: pointsUsed || 0,
+            pointsEarned: Math.floor(subtotal / 100000), // 1 point per 100k
             statusHistory: [{
                 status: 'pending',
                 note: 'Đơn hàng mới được tạo',
             }],
         });
+
+        // Deduct points from user immediately if used
+        if (pointsUsed > 0) {
+            user.points -= pointsUsed;
+            await user.save();
+        }
 
         await Promise.all(
             stockUpdates.map(({ productId, quantity }) =>
@@ -203,6 +255,22 @@ exports.updateOrderStatus = async (req, res, next) => {
         if (status === 'delivered') {
             order.deliveredAt = new Date();
             order.paymentStatus = 'paid'; 
+
+            // Update User for Loyalty and Stats
+            const User = require('../models/User');
+            const user = await User.findById(order.user);
+            if (user) {
+                user.points += order.pointsEarned;
+                user.totalSpent += order.totalAmount;
+                user.totalOrders += 1;
+
+                // Recalculate membership level
+                if (user.totalSpent >= 50000000) user.membershipLevel = 'diamond';
+                else if (user.totalSpent >= 15000000) user.membershipLevel = 'gold';
+                else if (user.totalSpent >= 5000000) user.membershipLevel = 'silver';
+
+                await user.save();
+            }
         }
 
         await order.save();

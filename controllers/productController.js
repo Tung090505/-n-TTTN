@@ -171,6 +171,18 @@ exports.addReview = async (req, res, next) => {
             return next(new AppError('Không tìm thấy sản phẩm.', 404));
         }
 
+        // Check if user has purchased this product and it was delivered
+        const Order = require('../models/Order');
+        const hasPurchased = await Order.findOne({
+            user: req.user.id,
+            orderStatus: 'delivered',
+            'items.product': product._id
+        });
+
+        if (!hasPurchased) {
+            return next(new AppError('Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và nhận hàng thành công.', 403));
+        }
+
         const alreadyReviewed = product.reviews.find(
             r => r.user.toString() === req.user.id.toString()
         );

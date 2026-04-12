@@ -1,10 +1,11 @@
 <% layout('layouts/main') %>
 
-<div class="container mx-auto px-6 py-10">
-    <div class="flex flex-col lg:flex-row gap-8">
-        <%- include('../partials/admin-sidebar', { active: 'chat' }) %>
+<div class="flex min-h-screen bg-slate-50">
+    <!-- Sidebar -->
+    <%- include('../partials/admin-sidebar', { active: 'chat' }) %>
 
-        <main class="flex-1 space-y-8 min-h-[600px]">
+    <!-- Main Content -->
+    <main class="flex-1 p-8 min-h-[600px]">
             <div class="glass p-1 rounded-[2.5rem] overflow-hidden flex flex-col h-[700px]">
                 <div class="flex h-full divide-x divide-slate-100">
                     <!-- Danh sách khách hàng -->
@@ -60,7 +61,6 @@
                 </div>
             </div>
         </main>
-    </div>
 </div>
 
 <!-- Socket.io -->

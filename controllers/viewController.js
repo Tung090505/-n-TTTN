@@ -53,7 +53,7 @@ exports.getProductDetail = async (req, res, next) => {
             .populate('reviews.user', 'firstName lastName avatar');
 
         if (!product) {
-            return res.status(404).render('error', { statusCode: 404, message: 'Sản phẩm không tồn tại.' });
+            return res.status(404).render('error', { title: '404 - Không tìm thấy', statusCode: 404, message: 'Sản phẩm không tồn tại.' });
         }
 
         const relatedProducts = await Product.find({
@@ -62,10 +62,21 @@ exports.getProductDetail = async (req, res, next) => {
             isActive: true
         }).limit(4);
 
+        let hasPurchased = false;
+        if (req.user) {
+            const hasOrder = await Order.findOne({
+                user: req.user.id,
+                orderStatus: 'delivered',
+                'items.product': product._id
+            });
+            hasPurchased = !!hasOrder;
+        }
+
         res.render('products/detail', {
             title: `${product.name} | TechStore`,
             product,
-            relatedProducts
+            relatedProducts,
+            hasPurchased
         });
     } catch (error) {
         next(error);
@@ -80,6 +91,17 @@ exports.getLogin = (req, res) => {
 exports.getRegister = (req, res) => {
     if (req.user) return res.redirect('/');
     res.render('auth/register', { title: 'Đăng ký tài khoản | TechStore' });
+};
+
+exports.getForgotPassword = (req, res) => {
+    res.render('auth/forgot-password', { title: 'Quên mật khẩu | TechStore' });
+};
+
+exports.getResetPassword = (req, res) => {
+    res.render('auth/reset-password', {
+        title: 'Đặt lại mật khẩu | TechStore',
+        token: req.params.token
+    });
 };
 
 exports.getCart = async (req, res, next) => {
@@ -127,13 +149,15 @@ exports.getMyOrders = async (req, res, next) => {
 exports.getOrderDetail = async (req, res, next) => {
     try {
         const query = { orderCode: req.params.orderCode };
-        
+
         if (req.user.role !== 'admin' && req.user.role !== 'staff') {
             query.user = req.user.id;
         }
 
-        const order = await Order.findOne(query).populate('user', 'firstName lastName email phone');
-        if (!order) return res.status(404).render('error', { statusCode: 404, title: 'Lỗi', message: 'Không tìm thấy đơn hàng.' });
+        const order = await Order.findOne(query)
+            .populate('user', 'firstName lastName email phone')
+            .populate('items.product', 'slug');
+        if (!order) return res.status(404).render('error', { title: 'Lỗi', statusCode: 404, message: 'Không tìm thấy đơn hàng.' });
 
         let sepayQR = null;
         if (order.paymentMethod === 'sepay' && order.paymentStatus === 'unpaid') {
@@ -150,6 +174,19 @@ exports.getOrderDetail = async (req, res, next) => {
             title: `Đơn hàng #${order.orderCode} | TechStore`,
             order,
             sepayQR
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getWishlist = async (req, res, next) => {
+    try {
+        const User = require('../models/User');
+        const user = await User.findById(req.user.id).populate('wishlist');
+        res.render('user/wishlist', {
+            title: 'Danh sách yêu thích | TechStore',
+            wishlist: user.wishlist
         });
     } catch (error) {
         next(error);

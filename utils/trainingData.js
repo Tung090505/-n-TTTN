@@ -24,7 +24,7 @@ const BUILD_TEMPLATES = [
         budgetRange: { min: 15000000, max: 25000000 },
         idealSpecs: {
             cpu: { brands: ['Intel', 'AMD'], keywords: ['i5', 'i7', 'Ryzen 5', 'Ryzen 7'], minCores: 8 },
-            gpu: { brands: ['MSI', 'ASUS', 'Gigabyte'], keywords: ['RTX 4060 Ti', 'RTX 4070', 'RX 7700 XT', 'RX 7800 XT'], minVram: 8 },
+            gpu: { brands: ['MSI', 'ASUS', 'Gigabyte'], keywords: ['RTX 4060', 'RTX 4060 Ti', 'RTX 4070', 'RX 7700 XT', 'RX 7800 XT'], minVram: 8 },
             ram: { minCapacity: 16, type: ['DDR4', 'DDR5'], minSpeed: 3600 },
             storage: { minCapacity: 1000, type: ['NVMe SSD'] },
             motherboard: { keywords: ['B760', 'B650', 'X670'] },
@@ -312,6 +312,9 @@ const PURPOSE_DICTIONARY = {
             { word: 'tản nhiệt', weight: 2 },
             { word: 'rgb', weight: 2 },
             { word: 'case kính', weight: 2 },
+            { word: 'máy khỏe', weight: 3 },
+            { word: 'cấu hình tốt', weight: 3 },
+            { word: 'giá tốt', weight: 2 },
         ]
     },
     'do-hoa': {

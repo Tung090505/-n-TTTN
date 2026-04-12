@@ -146,7 +146,9 @@ app.use(async (req, res, next) => {
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 app.use('/', viewRoutes);    
-app.use('/api/auth', authRoutes);    
+const couponRoutes = require('./routes/couponRoutes');
+app.use('/api/auth', authRoutes);
+app.use('/api/coupons', couponRoutes);
 
 const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/chat', chatRoutes);

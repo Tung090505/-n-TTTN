@@ -220,7 +220,7 @@ ProductSchema.pre('save', function (next) {
         this.slug = this.name
             .toLowerCase()
             .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '') // Xóa dấu tiếng Việt
+            .replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9\s]/g, '')
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')

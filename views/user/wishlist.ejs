@@ -1,0 +1,98 @@
+<% layout('layouts/main') %>
+<div class="container mx-auto px-6 py-10 min-h-screen">
+    <div class="flex items-center justify-between mb-10">
+        <div>
+            <h1 class="text-4xl font-black text-slate-800 tracking-tight">DANH SÁCH YÊU THÍCH</h1>
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Lưu trữ các sản phẩm bạn quan tâm</p>
+        </div>
+        <a href="/san-pham" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Tiếp tục mua sắm
+        </a>
+    </div>
+
+    <% if (wishlist.length === 0) { %>
+        <div class="glass rounded-[3rem] p-20 text-center border-2 border-dashed border-slate-100">
+            <div class="w-24 h-24 bg-red-50 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 mb-2">Danh sách trống</h2>
+            <p class="text-slate-500 font-medium mb-8">Bạn chưa thêm sản phẩm nào vào danh sách yêu thích.</p>
+            <a href="/san-pham" class="inline-block px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-500/25 hover:scale-105 transition-transform">Khám phá sản phẩm</a>
+        </div>
+    <% } else { %>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <% wishlist.forEach(p => { %>
+                <article class="product-card group bg-white rounded-2xl border border-slate-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 relative flex flex-col h-full overflow-hidden">
+                    <div class="relative p-4 aspect-square flex items-center justify-center bg-slate-50/50">
+                        <a href="/san-pham/<%= p.slug %>" class="block w-full h-full p-2">
+                            <img src="<%= p.thumbnail %>" alt="<%= p.name %>" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                        </a>
+                        <button onclick="toggleWishlist('<%= p._id %>')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white flex items-center justify-center text-red-500 shadow-md hover:bg-red-50 transition-all border border-red-100">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-5 flex flex-col flex-grow bg-white">
+                        <h3 class="font-bold text-slate-800 leading-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[2.5rem] text-sm">
+                            <a href="/san-pham/<%= p.slug %>"><%= p.name %></a>
+                        </h3>
+                        
+                        <div class="mt-auto flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-blue-600 font-black text-lg leading-none">
+                                    <%= (p.salePrice || p.price).toLocaleString('vi-VN') %>đ
+                                </p>
+                                <% if(p.salePrice) { %>
+                                    <p class="text-[10px] text-slate-400 line-through mt-1 font-bold">
+                                        <%= p.price.toLocaleString('vi-VN') %>đ
+                                    </p>
+                                <% } %>
+                            </div>
+                            <button onclick="addToCart('<%= p._id %>')" class="p-3 rounded-xl bg-slate-900 text-white hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    async function toggleWishlist(id) {
+        try {
+            const res = await fetch(`/api/auth/wishlist/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                showToast(data.message || 'Lỗi! Vui lòng thử lại.', 'error');
+            }
+        } catch (err) { 
+            console.error(err);
+            showToast('Lỗi server', 'error');
+        }
+    }
+
+    async function addToCart(id) {
+        try {
+            const res = await fetch('/api/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: id, quantity: 1 })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+            } else {
+                showToast(data.message || 'Lỗi! Vui lòng thử lại.', 'error');
+            }
+        } catch (err) { console.error(err); }
+    }
+</script>

@@ -49,6 +49,18 @@
                 <div class="h-6 w-px bg-slate-200 hidden lg:block"></div>
 
                 <% if (user) { %>
+                    <!-- Wishlist Icon -->
+                    <a href="/tai-khoan/yeu-thich" class="relative group hidden sm:flex">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xl group-hover:bg-red-50 group-hover:text-red-500 transition-all text-slate-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                        </div>
+                    </a>
+
                     <!-- Cart Icon -->
                     <a href="/gio-hang" class="relative group">
                         <div
@@ -98,6 +110,15 @@
                                             </path>
                                         </svg>
                                         Đơn hàng
+                                    </a>
+                                    <a href="/tai-khoan/yeu-thich"
+                                        class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-red-500 font-medium transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                            </path>
+                                        </svg>
+                                        Yêu thích
                                     </a>
                                     <a href="/tai-khoan"
                                         class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 font-medium transition-colors">

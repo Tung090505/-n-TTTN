@@ -80,21 +80,21 @@
           if (!message) return;
           const container = document.getElementById('toast-container');
           
-          const iconSuccess = `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-          const iconError = `<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+          const iconSuccess = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
+          const iconError = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
           
           const toast = document.createElement('div');
-          toast.className = `group relative bg-white/90 backdrop-blur-xl border border-white/50 p-5 rounded-[2rem] shadow-2xl flex items-center gap-4 transition-all duration-500 animate-toast-in hover:-translate-y-1`;
+          toast.className = `group relative bg-white border border-slate-200 p-4 rounded-2xl shadow-xl flex items-center gap-4 transition-all duration-500 animate-toast-in hover:shadow-2xl`;
           
           const icon = type === 'success' ? iconSuccess : iconError;
           const title = type === 'success' ? 'Thành công' : 'Lỗi hệ thống';
           
           toast.innerHTML = `
-                <div class="${type === 'success' ? 'bg-emerald-50' : 'bg-red-50'} p-3 rounded-2xl flex-shrink-0">
+                <div class="flex-shrink-0 ${type === 'success' ? 'text-emerald-500' : 'text-red-500'}">
                     ${icon}
                 </div>
                 <div class="flex-1 pr-6">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5">${title}</p>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">${title}</p>
                     <p class="text-[13px] font-bold text-slate-800 leading-snug">${message}</p>
                 </div>
                 <button onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-600 transition-colors">
@@ -124,7 +124,7 @@
         // Check for specific query params (like registration success)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('registered')) {
-          showToast('Đăng ký thành công! Chào mừng bạn gia nhập TechStore. ✨', 'success');
+          showToast('Đăng ký thành công! Chào mừng bạn gia nhập TechStore.', 'success');
         }
       </script>
     <%- include('../partials/chat-box') %>
