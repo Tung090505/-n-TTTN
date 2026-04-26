@@ -14,6 +14,7 @@ const initSocket = (server) => {
         // Người dùng tham gia vào phòng chat riêng (room name là userId)
         socket.on('join', (userId) => {
             socket.join(userId);
+            console.log(`Socket: User ${userId} joined their private room`);
         });
 
         // Nhân viên tham gia vào hàng chờ hỗ trợ
