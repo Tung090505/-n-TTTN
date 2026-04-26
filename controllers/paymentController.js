@@ -1,6 +1,7 @@
 
 const Order = require('../models/Order');
 const { AppError } = require('../middleware/errorHandler');
+const sendEmail = require('../utils/sendEmail');
 
 /**
  * Xử lý Webhook từ SePay
@@ -59,6 +60,48 @@ exports.sepayWebhook = async (req, res, next) => {
         });
 
         await order.save();
+        
+        // --- 1. Thông báo Real-time qua Socket.io ---
+        const io = req.app.get('io');
+        if (io) {
+            // Gửi thông báo đến người dùng cụ thể (room là userId)
+            io.to(order.user.toString()).emit('payment_success', {
+                orderCode: order.orderCode,
+                message: 'Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.'
+            });
+            console.log(`SePay Webhook: Socket notification sent to user ${order.user}`);
+        }
+
+        // --- 2. Gửi Email xác nhận cho khách hàng ---
+        // Cần populate user để lấy email
+        const populatedOrder = await Order.findById(order._id).populate('user');
+        if (populatedOrder && populatedOrder.user && populatedOrder.user.email) {
+            try {
+                await sendEmail({
+                    email: populatedOrder.user.email,
+                    subject: `[TechStore] Xác nhận thanh toán đơn hàng ${order.orderCode}`,
+                    message: `Chào ${populatedOrder.user.name},\n\nChúng tôi đã nhận được thanh toán ${amount.toLocaleString('vi-VN')}đ cho đơn hàng ${order.orderCode}.\nĐơn hàng của bạn hiện đang được xử lý.\n\nCảm ơn bạn đã mua sắm tại TechStore!`,
+                    html: `
+                        <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #2c3e50; text-align: center;">Xác nhận thanh toán thành công</h2>
+                            <p>Chào <strong>${populatedOrder.user.name}</strong>,</p>
+                            <p>TechStore xin thông báo chúng tôi đã nhận được thanh toán cho đơn hàng của bạn.</p>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <p style="margin: 5px 0;"><strong>Mã đơn hàng:</strong> ${order.orderCode}</p>
+                                <p style="margin: 5px 0;"><strong>Số tiền:</strong> <span style="color: #e74c3c; font-weight: bold;">${amount.toLocaleString('vi-VN')}đ</span></p>
+                                <p style="margin: 5px 0;"><strong>Trạng thái:</strong> Đã thanh toán</p>
+                            </div>
+                            <p>Đơn hàng của bạn đang được chuẩn bị và sẽ sớm được giao đến bạn.</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 0.9em; color: #7f8c8d; text-align: center;">Đây là email tự động, vui lòng không phản hồi email này.</p>
+                        </div>
+                    `
+                });
+                console.log(`SePay Webhook: Confirmation email sent to ${populatedOrder.user.email}`);
+            } catch (err) {
+                console.error('SePay Webhook: Error sending confirmation email:', err);
+            }
+        }
 
         console.log('SePay Webhook: Order updated successfully:', orderCode);
 

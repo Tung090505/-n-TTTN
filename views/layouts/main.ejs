@@ -128,6 +128,28 @@
         }
       </script>
     <%- include('../partials/chat-box') %>
+    
+    <!-- Socket.io Real-time Notifications -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const currentUserId = '<%= locals.user ? locals.user._id : "" %>';
+      
+      if (currentUserId) {
+        // Join vào room cá nhân để nhận thông báo (như thanh toán thành công)
+        socket.emit('join', currentUserId);
+        console.log('Joined private notification room:', currentUserId);
+
+        // Lắng nghe sự kiện thanh toán thành công
+        socket.on('payment_success', (data) => {
+          showToast(data.message, 'success');
+          // Nếu đang ở trang chi tiết đơn hàng đó thì reload để cập nhật UI
+          if (window.location.pathname.includes('/tai-khoan/don-hang/' + data.orderCode)) {
+            setTimeout(() => window.location.reload(), 2000);
+          }
+        });
+      }
+    </script>
 </body>
 
 </html>

@@ -176,8 +176,9 @@ const server = app.listen(PORT, () => {
     console.log(`📅 Thời gian khởi động: ${new Date().toLocaleString('vi-VN')}`);
 });
 
-// Khởi tạo Socket.io
-initSocket(server);
+// Khởi tạo Socket.io và gắn vào app
+const io = initSocket(server);
+app.set('io', io);
 
 process.on('unhandledRejection', (err) => {
     console.error(`❌ Lỗi không được xử lý: ${err.message}`);
