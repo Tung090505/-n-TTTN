@@ -47,11 +47,13 @@
         opacity: 0;
         transform: translateX(100%) scale(0.9);
       }
+
       to {
         opacity: 1;
         transform: translateX(0) scale(1);
       }
     }
+
     .animate-toast-in {
       animation: toast-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -79,16 +81,16 @@
         function showToast(message, type = 'success') {
           if (!message) return;
           const container = document.getElementById('toast-container');
-          
+
           const iconSuccess = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>`;
           const iconError = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
-          
+
           const toast = document.createElement('div');
           toast.className = `group relative bg-white border border-slate-200 p-4 rounded-2xl shadow-xl flex items-center gap-4 transition-all duration-500 animate-toast-in hover:shadow-2xl`;
-          
+
           const icon = type === 'success' ? iconSuccess : iconError;
           const title = type === 'success' ? 'Thành công' : 'Lỗi hệ thống';
-          
+
           toast.innerHTML = `
                 <div class="flex-shrink-0 ${type === 'success' ? 'text-emerald-500' : 'text-red-500'}">
                     ${icon}
@@ -101,14 +103,14 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             `;
-          
+
           container.appendChild(toast);
-          
+
           // Auto remove
           setTimeout(() => {
-            if(toast.parentElement) {
-                toast.classList.add('opacity-0', 'scale-90', 'translate-x-[150%]');
-                setTimeout(() => toast.remove(), 500);
+            if (toast.parentElement) {
+              toast.classList.add('opacity-0', 'scale-90', 'translate-x-[150%]');
+              setTimeout(() => toast.remove(), 500);
             }
           }, 4500);
         }
@@ -127,36 +129,37 @@
           showToast('Đăng ký thành công! Chào mừng bạn gia nhập TechStore.', 'success');
         }
       </script>
-    <%- include('../partials/chat-box') %>
-    
-    <!-- Socket.io Real-time Notifications -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const currentUserId = '<%= locals.user ? locals.user._id : "" %>';
-      
-      if (currentUserId) {
-        const socket = io(); // Để Socket.io tự động chọn transport tốt nhất (Websocket/Polling)
-        
-        // Đảm bảo chỉ join room sau khi đã kết nối thành công
-        socket.on('connect', () => {
-          socket.emit('join', currentUserId);
-          console.log('✅ Socket.io: Đã kết nối và tham gia phòng thông báo:', currentUserId);
-        });
+      <%- include('../partials/chat-box') %>
 
-        // Lắng nghe sự kiện thanh toán thành công
-        socket.on('payment_success', (data) => {
-          showToast(data.message, 'success');
-          // Chuyển hướng về trang lịch sử đơn hàng
-          setTimeout(() => {
-            window.location.href = '/tai-khoan/don-hang';
-          }, 2000);
-        });
+        <!-- Socket.io Real-time Notifications -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+          // Lấy ID người dùng từ server-side locals
+          const currentUserId = '<%= locals.user ? locals.user._id || locals.user.id : "" %>';
+          console.log(' Debug: currentUserId is', currentUserId);
 
-        socket.on('connect_error', (err) => {
-          console.error('Socket.io Connection Error:', err);
-        });
-      }
-    </script>
+          if (currentUserId && currentUserId !== "") {
+            const socket = io();
+
+            socket.on('connect', () => {
+              socket.emit('join', currentUserId);
+              console.log(' Socket.io: Đã kết nối và tham gia phòng:', currentUserId);
+            });
+
+            socket.on('payment_success', (data) => {
+              showToast(data.message, 'success');
+              setTimeout(() => {
+                window.location.href = '/tai-khoan/don-hang';
+              }, 2000);
+            });
+
+            socket.on('connect_error', (err) => {
+              console.error(' Socket.io Connection Error:', err);
+            });
+          } else {
+            console.warn(' Socket.io: Không tìm thấy userId, không thể tham gia phòng thông báo.');
+          }
+        </script>
 </body>
 
 </html>
