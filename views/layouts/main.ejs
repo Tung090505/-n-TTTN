@@ -135,12 +135,12 @@
       const currentUserId = '<%= locals.user ? locals.user._id : "" %>';
       
       if (currentUserId) {
-        const socket = io({ transports: ['websocket'] });
+        const socket = io(); // Để Socket.io tự động chọn transport tốt nhất (Websocket/Polling)
         
         // Đảm bảo chỉ join room sau khi đã kết nối thành công
         socket.on('connect', () => {
           socket.emit('join', currentUserId);
-          console.log('Socket.io: Successfully connected and joined room:', currentUserId);
+          console.log('✅ Socket.io: Đã kết nối và tham gia phòng thông báo:', currentUserId);
         });
 
         // Lắng nghe sự kiện thanh toán thành công

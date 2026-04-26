@@ -5,8 +5,10 @@ const initSocket = (server) => {
     const io = socketio(server, {
         cors: {
             origin: "*",
-            methods: ["GET", "POST"]
-        }
+            methods: ["GET", "POST"],
+            credentials: true
+        },
+        transports: ['websocket', 'polling'] // Hỗ trợ cả 2 phương thức để tăng độ ổn định
     });
 
     io.on('connection', (socket) => {
