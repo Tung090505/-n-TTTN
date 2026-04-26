@@ -132,13 +132,16 @@
     <!-- Socket.io Real-time Notifications -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      const socket = io({ transports: ['websocket'] });
       const currentUserId = '<%= locals.user ? locals.user._id : "" %>';
       
       if (currentUserId) {
-        // Join vào room cá nhân để nhận thông báo (như thanh toán thành công)
-        socket.emit('join', currentUserId);
-        console.log('Attempting to join private room:', currentUserId);
+        const socket = io({ transports: ['websocket'] });
+        
+        // Đảm bảo chỉ join room sau khi đã kết nối thành công
+        socket.on('connect', () => {
+          socket.emit('join', currentUserId);
+          console.log('Socket.io: Successfully connected and joined room:', currentUserId);
+        });
 
         // Lắng nghe sự kiện thanh toán thành công
         socket.on('payment_success', (data) => {
@@ -147,6 +150,10 @@
           setTimeout(() => {
             window.location.href = '/tai-khoan/don-hang';
           }, 2000);
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Socket.io Connection Error:', err);
         });
       }
     </script>
