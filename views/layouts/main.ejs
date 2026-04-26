@@ -131,11 +131,11 @@
       </script>
       <%- include('../partials/chat-box') %>
 
-        <!-- Socket.io Real-time Notifications -->
+
         <script src="/socket.io/socket.io.js"></script>
         <script>
-          // Lấy ID người dùng từ server-side locals
-          const currentUserId = '<%= locals.user ? locals.user._id || locals.user.id : "" %>';
+
+          const currentUserId = '<%= (typeof user !== "undefined" && user) ? user._id : "" %>';
           console.log(' Debug: currentUserId is', currentUserId);
 
           if (currentUserId && currentUserId !== "") {
