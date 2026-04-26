@@ -1,6 +1,6 @@
 
 const BUILD_TEMPLATES = [
-    
+
     {
         name: 'Gaming Entry (10-15 triệu)',
         purpose: 'gaming',
@@ -228,10 +228,49 @@ const BUILD_TEMPLATES = [
         },
         budgetAllocation: { laptop: 1.0 }
     },
+    {
+        name: 'Đa năng / Giải trí (10-20 triệu)',
+        purpose: 'da-nang',
+        tier: 'mid',
+        budgetRange: { min: 10000000, max: 20000000 },
+        idealSpecs: {
+            cpu: { brands: ['Intel', 'AMD'], keywords: ['i5', 'Ryzen 5'] },
+            gpu: { brands: ['MSI', 'ASUS'], keywords: ['RTX 3060', 'RTX 4060'] },
+            ram: { minCapacity: 16 },
+            storage: { minCapacity: 512 }
+        },
+        budgetAllocation: { cpu: 0.22, gpu: 0.30, ram: 0.10, storage: 0.12, motherboard: 0.12, psu: 0.07, case: 0.07 }
+    },
+    {
+        name: 'Đa năng cao cấp (25-50 triệu)',
+        purpose: 'da-nang',
+        tier: 'high',
+        budgetRange: { min: 25000000, max: 50000000 },
+        idealSpecs: {
+            cpu: { brands: ['Intel', 'AMD'], keywords: ['i7', 'i9', 'Ryzen 7', 'Ryzen 9'] },
+            gpu: { brands: ['MSI', 'ASUS'], keywords: ['RTX 4070', 'RTX 4080'] },
+            ram: { minCapacity: 32 },
+            storage: { minCapacity: 1000 }
+        },
+        budgetAllocation: { cpu: 0.20, gpu: 0.35, ram: 0.12, storage: 0.12, motherboard: 0.10, psu: 0.06, case: 0.05 }
+    },
+    {
+        name: 'Đa năng cực cao cấp (50 triệu - 2 tỷ)',
+        purpose: 'da-nang',
+        tier: 'ultra',
+        budgetRange: { min: 50000000, max: 2000000000 },
+        idealSpecs: {
+            cpu: { brands: ['Intel', 'AMD'], keywords: ['i9', 'Ryzen 9', 'Threadripper'] },
+            gpu: { brands: ['MSI', 'ASUS', 'Gigabyte'], keywords: ['RTX 4080', 'RTX 4090', '7900 XTX'] },
+            ram: { minCapacity: 64 },
+            storage: { minCapacity: 2000 }
+        },
+        budgetAllocation: { cpu: 0.25, gpu: 0.45, ram: 0.10, storage: 0.05, motherboard: 0.10, psu: 0.03, case: 0.02 }
+    },
 ];
 
 const COMPATIBILITY_RULES = {
-    
+
     socketMapping: {
         'LGA1700': ['B660', 'H670', 'B760', 'H770', 'Z690', 'Z790'],
         'LGA1200': ['B460', 'H470', 'B560', 'H570', 'Z490', 'Z590'],
@@ -517,6 +556,14 @@ const AI_RESPONSES = {
         'hoc-tap': [
             'Cấu hình học tập cần ổn định, đủ mạnh cho các tác vụ cơ bản.',
             'PC cho sinh viên nên cân bằng hiệu năng và ngân sách.',
+        ],
+        'future-proof': [
+            'Tôi đã ưu tiên các linh kiện đời mới nhất (DDR5, Socket mới) để bạn dễ dàng nâng cấp sau này.',
+            'Cấu hình này tập trung vào khả năng nâng cấp lâu dài với nền tảng phần cứng hiện đại.',
+        ],
+        'reliability': [
+            'Tôi đã lựa chọn các linh kiện từ các thương hiệu uy tín và có độ bền cao cho bạn.',
+            'Cấu hình này ưu tiên sự ổn định và bền bỉ trong suốt quá trình sử dụng.',
         ],
     },
     compatibility: {

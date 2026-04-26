@@ -172,12 +172,12 @@ function analyzeDescription(description) {
     for (const { regex, multiplier } of budgetPatterns) {
         const match = text.match(regex);
         if (match) {
-            // Lấy group đầu tiên bắt được số
-            const numStr = match[1] || match[0];
             if (multiplier === 1) {
-                result.budget = parseInt(numStr.replace(/[.,]/g, ''));
+                // Ghép tất cả các nhóm bắt được (ví dụ 100, 000, 000 -> 100000000)
+                const fullNumStr = match.slice(1).join('');
+                result.budget = parseInt(fullNumStr.replace(/[.,]/g, ''));
             } else {
-                result.budget = parseInt(numStr) * multiplier;
+                result.budget = parseInt(match[1]) * multiplier;
             }
             break;
         }
@@ -213,8 +213,27 @@ function analyzeDescription(description) {
     if (text.match(/im|quiet|silent|yên tĩnh|êm|không ồn/)) {
         result.priorities.push('quiet');
     }
+    if (text.match(/nâng cấp|tương lai|phát triển|sau này|mới nhất|về sau/)) {
+        result.priorities.push('future-proof');
+    }
+    if (text.match(/màu trắng|vỏ trắng|white|tông trắng|full trắng/)) {
+        result.priorities.push('white-theme');
+    }
+    if (text.match(/nhỏ gọn|itx|mini|compact|gọn gàng/)) {
+        result.priorities.push('compact');
+    }
 
-    const responses = AI_RESPONSES.analysis[result.purpose] || AI_RESPONSES.analysis['hoc-tap'];
+    // --- Bước 4: Chọn câu phản hồi của AI ---
+    let responseCategory = result.purpose;
+    
+    // Nếu có ưu tiên đặc biệt, ưu tiên phản hồi theo đó
+    if (result.priorities.includes('future-proof')) {
+        responseCategory = 'future-proof';
+    } else if (result.priorities.includes('reliability')) {
+        responseCategory = 'reliability';
+    }
+
+    const responses = AI_RESPONSES.analysis[responseCategory] || AI_RESPONSES.analysis['hoc-tap'];
     result.aiResponse = responses[Math.floor(Math.random() * responses.length)];
 
     const hardwarePatterns = [
@@ -254,12 +273,14 @@ function findBestTemplate(purpose, budget) {
         let score = 0;
 
         if (budget >= template.budgetRange.min && budget <= template.budgetRange.max) {
-            score += 50; 
+            score = 100; // Khớp hoàn hảo
+        } else if (budget > template.budgetRange.max) {
+            // Ngân sách cao hơn template này: Template càng cao cấp (max lớn) thì điểm càng cao
+            score = 50 + (template.budgetRange.max / 1000000000) * 10;
         } else {
-            
-            const midBudget = (template.budgetRange.min + template.budgetRange.max) / 2;
-            const distance = Math.abs(budget - midBudget) / midBudget;
-            score += Math.max(0, 30 - distance * 30);
+            // Ngân sách thấp hơn: Tính theo khoảng cách
+            const distance = (template.budgetRange.min - budget) / budget;
+            score = Math.max(0, 30 - distance * 10);
         }
 
         if (score > bestScore) {
@@ -275,125 +296,118 @@ function findBestTemplate(purpose, budget) {
     return bestTemplate;
 }
 
-function scoreProduct(product, budgetForPart, template, category, userTokens, idf) {
+function scoreProduct(product, budgetForPart, template, category, userTokens, idf, priorities = [], totalBudget = 20000000) {
     const actualPrice = product.salePrice || product.price;
     let totalScore = 0;
     const scoreBreakdown = {};
 
-    const priceRatio = actualPrice / budgetForPart;
+    const priceDiffRatio = (actualPrice - budgetForPart) / budgetForPart;
     let priceScore = 0;
-    if (priceRatio >= 0.7 && priceRatio <= 1.0) {
-        priceScore = 30; 
-    } else if (priceRatio > 1.0 && priceRatio <= 1.3) {
-        priceScore = 30 - (priceRatio - 1) * 50; 
-    } else if (priceRatio >= 0.5 && priceRatio < 0.7) {
-        priceScore = 20; 
-    } else if (priceRatio > 1.3) {
-        priceScore = 5; 
+    
+    // THUẬT TOÁN "BÁM SÁT MỤC TIÊU" (Target Proximity)
+    if (Math.abs(priceDiffRatio) <= 0.1) {
+        // Khớp giá hoàn hảo (lệch dưới 10%): Điểm tối đa
+        priceScore = 100; 
+    } else if (actualPrice < budgetForPart) {
+        // Rẻ hơn ngân sách: Phạt nhẹ (Càng rẻ quá càng ít điểm vì không xứng tầm)
+        // Ví dụ: Ngân sách 10tr mà mua đồ 2tr thì điểm sẽ thấp hơn đồ 9tr
+        priceScore = 100 - ( (budgetForPart - actualPrice) / budgetForPart ) * 40;
     } else {
-        priceScore = 10; 
+        // Đắt hơn ngân sách: Phạt nặng (Để không bị vượt budget)
+        // Máy rẻ phạt nặng hơn máy đắt
+        const penaltyFactor = totalBudget >= 50000000 ? 50 : 300; 
+        priceScore = 100 - priceDiffRatio * penaltyFactor;
+
+        // Nếu đắt hơn quá 30% ngân sách món đồ: Trảm không nương tay
+        if (actualPrice > budgetForPart * 1.3) {
+            priceScore -= 1000;
+        }
     }
-    scoreBreakdown.price = Math.max(0, priceScore);
+    
+    scoreBreakdown.price = priceScore;
     totalScore += scoreBreakdown.price;
+
+    const performanceWeight = totalBudget >= 50000000 ? 10.0 : 0.5; // Giảm tầm quan trọng hiệu năng ở máy rẻ
 
     let keywordScore = 0;
     if (template && template.idealSpecs[category]) {
         const idealSpec = template.idealSpecs[category];
         const productText = `${product.name} ${product.brand} ${JSON.stringify(product.specifications || {})}`.toLowerCase();
 
-        if (idealSpec.brands && idealSpec.brands.length > 0) {
-            if (idealSpec.brands.some(b => productText.includes(b.toLowerCase()))) {
-                keywordScore += 5;
-            }
+        if (idealSpec.brands?.some(b => productText.includes(b.toLowerCase()))) {
+            keywordScore += 10;
         }
-
-        if (idealSpec.keywords) {
-            const matchCount = idealSpec.keywords.filter(k => productText.includes(k.toLowerCase())).length;
-            keywordScore += Math.min(matchCount * 5, 15);
-        }
-
-        const specs = product.specifications || {};
-        if (idealSpec.minCores && specs.cores >= idealSpec.minCores) keywordScore += 5;
-        if (idealSpec.minVram && specs.vram >= idealSpec.minVram) keywordScore += 5;
-        if (idealSpec.minCapacity && specs.capacity >= idealSpec.minCapacity) keywordScore += 5;
-        if (idealSpec.minWattage && specs.wattage >= idealSpec.minWattage) keywordScore += 5;
     }
-    scoreBreakdown.keyword = Math.min(keywordScore, 25);
+    scoreBreakdown.keyword = keywordScore * performanceWeight;
     totalScore += scoreBreakdown.keyword;
 
-    const ratingScore = (product.rating || 0) * 3; 
-    scoreBreakdown.rating = Math.min(ratingScore, 15);
-    totalScore += scoreBreakdown.rating;
-
-    const soldScore = Math.min((product.sold || 0) / 10, 10);
-    scoreBreakdown.popularity = soldScore;
-    totalScore += scoreBreakdown.popularity;
-
-    let perfScore = 0;
+    let finalPerfScore = 0;
     if (PERFORMANCE_SCORES[category]) {
         const productText = product.name.toLowerCase();
         for (const [model, score] of Object.entries(PERFORMANCE_SCORES[category])) {
             if (productText.includes(model.toLowerCase())) {
-                perfScore = (score / 100) * 15;
+                finalPerfScore = (score / 100) * 20 * performanceWeight;
                 break;
             }
         }
     }
-    scoreBreakdown.performance = perfScore;
+    scoreBreakdown.performance = finalPerfScore;
     totalScore += scoreBreakdown.performance;
 
-    if (userTokens && idf) {
-        const productTokens = tokenize(`${product.name} ${product.description || ''} ${product.brand}`);
-        const userVec = computeTFIDF(userTokens, idf);
-        const productVec = computeTFIDF(productTokens, idf);
-        const similarity = cosineSimilarity(userVec, productVec);
-
-        let brandBonus = 0;
-        const userText = userTokens.join(' ');
-        if (userText.includes(product.brand.toLowerCase())) {
-            brandBonus = 15;
-        } else if (product.brand.toLowerCase() === 'apple' && (userText.includes('macbook') || userText.includes('mac'))) {
-            brandBonus = 15;
-        }
-
-        scoreBreakdown.textSimilarity = (similarity * 5) + brandBonus;
-        totalScore += scoreBreakdown.textSimilarity;
-    }
-
-    if (product.salePrice && product.salePrice < product.price) {
-        const discount = ((product.price - product.salePrice) / product.price) * 100;
-        scoreBreakdown.saleBonus = Math.min(discount / 10, 5);
-        totalScore += scoreBreakdown.saleBonus;
-    }
-
-    // --- Bonus đặc biệt: Khớp trực tiếp mã linh kiện người dùng yêu cầu ---
-    if (userTokens && userTokens.length > 0) {
-        const fullDesc = userTokens.join(' ').toLowerCase();
-        let hardwareMatchBonus = 0;
-        const productNameLower = product.name.toLowerCase();
-
-        const hardwareModels = [
-            'rtx 4090', 'rtx 4080', 'rtx 4070', 'rtx 4060', 'rtx 40',
-            'rtx 3090', 'rtx 3080', 'rtx 3070', 'rtx 3060', 'rtx 30',
-            'gtx 1660', 'gtx 1650', 'i9', 'i7', 'i5', 'i3',
-            'ryzen 9', 'ryzen 7', 'ryzen 5', 'ryzen 3'
-        ];
-
-        for (const model of hardwareModels) {
-            if (fullDesc.includes(model) && productNameLower.includes(model)) {
-                hardwareMatchBonus = 50; // Bonus cực mạnh để ghi đè các yếu tố khác
-                break;
-            }
-        }
-        scoreBreakdown.hardwareMatch = hardwareMatchBonus;
-        totalScore += hardwareMatchBonus;
-    }
-
     return {
-        score: Math.round(totalScore * 100) / 100,
+        score: totalScore,
         breakdown: scoreBreakdown,
-        maxPossible: 100
+        maxPossible: 100,
+        reasoning: generateReasoning(product, category, template, priorities)
     };
+}
+
+function generateReasoning(product, category, template, priorities = []) {
+    const name = product.name;
+    const purpose = template?.purpose || 'da-nang';
+    
+    const reasons = {
+        cpu: {
+            gaming: `${name} có hiệu năng đơn nhân mạnh mẽ, giúp xử lý các tựa game AAA mượt mà không bị nghẽn.`,
+            'do-hoa': `${name} sở hữu nhiều nhân thực, giúp tăng tốc đáng kể thời gian render và xử lý đa nhiệm chuyên nghiệp.`,
+            'van-phong': `${name} là lựa chọn ổn định, tiết kiệm điện năng cho các tác vụ văn phòng hằng ngày.`,
+            default: `${name} cân bằng tốt giữa giá thành và hiệu năng cho mọi nhu cầu cơ bản.`
+        },
+        gpu: {
+            gaming: `Với hiệu năng đồ họa mạnh, ${name} cho phép trải nghiệm game ở mức thiết lập đồ họa tối ưu.`,
+            'do-hoa': `Hỗ trợ tốt cho các tập lệnh đồ họa chuyên sâu, giúp dựng hình 3D và video trơn tru hơn.`,
+            default: `Xử lý đồ họa sắc nét, đáp ứng tốt nhu cầu giải trí và làm việc.`
+        },
+        ram: {
+            'do-hoa': `Dung lượng RAM lớn giúp bạn mở hàng chục file thiết kế nặng cùng lúc mà không giật lag.`,
+            'lap-trinh': `Đủ bộ nhớ để chạy mượt các máy ảo (Docker, VM) và môi trường phát triển phức tạp.`,
+            default: `Tốc độ cao giúp hệ thống phản hồi nhanh chóng và chạy đa nhiệm hiệu quả.`
+        },
+        storage: {
+            gaming: `Tốc độ đọc ghi nhanh giúp giảm thời gian loading màn chơi chỉ còn vài giây.`,
+            default: `Không gian lưu trữ rộng rãi cùng độ bền cao, bảo vệ dữ liệu công việc an toàn.`
+        },
+        psu: {
+            default: `Cung cấp dòng điện ổn định, đạt chứng nhận hiệu suất cao giúp bảo vệ toàn bộ linh kiện của bạn.`
+        },
+        motherboard: {
+            default: `Nền tảng vững chắc với khả năng kết nối đa dạng và sẵn sàng cho các nâng cấp sau này.`
+        },
+        case: {
+            default: `Thiết kế tối ưu luồng khí và không gian lắp đặt, giúp hệ thống luôn mát mẻ và thẩm mỹ.`
+        }
+    };
+
+    let reason = reasons[category]?.[purpose] || reasons[category]?.default || "Linh kiện được đánh giá cao và phù hợp nhất trong tầm ngân sách này.";
+    
+    if (priorities.includes('future-proof')) {
+        reason += " Đây là lựa chọn hướng tới tương lai với công nghệ đời mới.";
+    }
+    if (priorities.includes('white-theme') && (name.toLowerCase().includes('white') || name.toLowerCase().includes('trắng'))) {
+        reason += " Màu sắc tông trắng hoàn hảo theo sở thích thẩm mỹ của bạn.";
+    }
+
+    return reason;
 }
 
 function checkCompatibility(config) {
@@ -468,51 +482,54 @@ function checkCompatibility(config) {
     return result;
 }
 
-async function findBestProduct(category, budgetForPart, template, userTokens, idf, priorities = []) {
-    
-    const products = await Product.find({
-        category: category,
+async function findBestProduct(category, budgetForPart, template, userTokens, idf, priorities = [], totalBudget = 20000000, currentConfig = {}) {
+    const query = {
+        category: { $regex: new RegExp(`^${category}$`, 'i') },
         isActive: true,
         stock: { $gt: 0 }
-    })
-        .sort({ rating: -1, sold: -1 })
-        .limit(50)
-        .select('name slug thumbnail price salePrice rating numReviews stock sold brand specifications category description');
+    };
+
+    if (category === 'motherboard' && currentConfig.cpu) {
+        const cpuSocket = currentConfig.cpu.product.specifications?.socket;
+        if (cpuSocket) {
+            const compatibleChipsets = COMPATIBILITY_RULES.socketMapping[cpuSocket] || [];
+            if (compatibleChipsets.length > 0) {
+                query.$and = [
+                    { 
+                        $or: compatibleChipsets.map(chipset => ({
+                            name: { $regex: new RegExp(chipset, 'i') }
+                        }))
+                    }
+                ];
+            }
+        }
+    }
+
+    const sortOrder = totalBudget >= 50000000 ? -1 : 1;
+    let products = await Product.find(query).sort({ price: sortOrder }).limit(500);
 
     if (products.length === 0) return null;
 
     const scoredProducts = products.map(product => {
-        const scoring = scoreProduct(product, budgetForPart, template, category, userTokens, idf);
-
-        if (priorities.includes('budget-friendly')) {
-            const actualPrice = product.salePrice || product.price;
-            if (actualPrice <= budgetForPart) scoring.score += 5;
-        }
-        if (priorities.includes('performance')) {
-            scoring.score += (scoring.breakdown.performance || 0) * 0.3;
-        }
-
-        return {
-            product,
-            score: scoring.score,
-            breakdown: scoring.breakdown,
-            actualPrice: product.salePrice || product.price
-        };
+        const scoring = scoreProduct(product, budgetForPart, template, category, userTokens, idf, priorities, totalBudget);
+        return { product, score: scoring.score, breakdown: scoring.breakdown, reasoning: scoring.reasoning };
     });
 
     scoredProducts.sort((a, b) => b.score - a.score);
-
     const best = scoredProducts[0];
     return {
         product: best.product,
         score: best.score,
         breakdown: best.breakdown,
+        reasoning: best.reasoning,
         alternatives: scoredProducts.slice(1, 4).map(s => ({
             product: s.product,
             score: s.score
         }))
     };
 }
+
+
 
 async function buildPCFromDescription(description) {
     // 1. Phân tích mô tả (Purpose, Budget, Priorities)
@@ -554,6 +571,7 @@ async function buildPCFromDescription(description) {
                         label: 'Laptop',
                         score: result.score,
                         scoreBreakdown: result.breakdown,
+                        reasoning: result.reasoning,
                         alternatives: result.alternatives || []
                     }
                 },
@@ -587,21 +605,25 @@ async function buildPCFromDescription(description) {
     for (let i = 0; i < priorityOrder.length; i++) {
         const part = priorityOrder[i];
         
-        // Tính % trọng số còn lại của các linh kiện chưa chọn
-        const remainingParts = priorityOrder.slice(i);
-        const totalWeightRemaining = remainingParts.reduce((sum, p) => sum + (allocation[p] || 0.1), 0);
-        
-        // Ngân sách dự kiến cho linh kiện này (dựa trên % trọng số trong số tiền CÒN LẠI)
-        const myWeight = (allocation[part] || 0.1) / totalWeightRemaining;
-        let budgetForThisPart = actualRemainingBudget * myWeight;
+        // Ngân sách dự kiến cho linh kiện này (LUÔN DÙNG TỔNG NGÂN SÁCH GỐC LÀM THƯỚC ĐO)
+        const weightInTotal = allocation[part] || 0.1;
+        let budgetForThisPart = analysis.budget * weightInTotal;
 
         // "THAM LAM": Với GPU/CPU trong Gaming/Đồ họa, cho phép lấn sang ngân sách khác một chút nếu cần
         if (['gpu', 'cpu'].includes(part) && (analysis.purpose === 'gaming' || analysis.purpose === 'do-hoa')) {
-            budgetForThisPart *= 1.15; // Ưu tiên linh kiện lõi mạnh hơn
+            budgetForThisPart *= 1.15; 
         }
 
+        // 5. Tìm sản phẩm tốt nhất cho linh kiện này (Truyền thêm config hiện tại để check tương thích)
         const result = await findBestProduct(
-            part, budgetForThisPart, template, userTokens, idf, analysis.priorities
+            part, 
+            budgetForThisPart, 
+            template, 
+            userTokens, 
+            idf, 
+            analysis.priorities,
+            analysis.budget,
+            config // TRUYỀN CONFIG ĐỂ CHECK TƯƠNG THÍCH NGAY LÚC CHỌN
         );
 
         if (result) {
@@ -613,6 +635,7 @@ async function buildPCFromDescription(description) {
                 label: PART_LABELS[part],
                 score: result.score,
                 scoreBreakdown: result.breakdown,
+                reasoning: result.reasoning,
                 alternatives: result.alternatives || []
             };
             totalPrice += actualPrice;
@@ -671,7 +694,8 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
                     actualPrice,
                     label: PART_LABELS[part],
                     isSelected: true,
-                    score: 100 
+                    score: 100,
+                    reasoning: 'Linh kiện bạn đã tự chọn cho cấu hình.'
                 };
                 spentBudget += actualPrice;
             }
@@ -705,6 +729,7 @@ async function suggestRemainingParts(selectedParts, purpose = 'da-nang', totalBu
                 label: PART_LABELS[part],
                 isSelected: false,
                 score: result.score,
+                reasoning: result.reasoning,
                 alternatives: result.alternatives || []
             };
             suggestedTotal += actualPrice;
