@@ -1,0 +1,234 @@
+<% layout('layouts/main') %>
+
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Đánh giá Website</h1>
+        <p class="text-gray-600 mb-8">Ý kiến của bạn giúp chúng tôi cải thiện dịch vụ tốt hơn</p>
+
+        <form id="feedbackForm">
+            <!-- Rating Stars -->
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-3">
+                    Bạn đánh giá website như thế nào? <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-2">
+                    <div class="flex gap-1" id="starRating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <span id="ratingText" class="text-lg font-semibold text-gray-700 ml-4"></span>
+                </div>
+                <input type="hidden" id="rating" name="rating" required>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-6">
+                <label for="category" class="block text-gray-700 font-semibold mb-2">
+                    Danh mục đánh giá
+                </label>
+                <select id="category" name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="Khác">Tổng thể</option>
+                    <option value="Giao diện">Giao diện</option>
+                    <option value="Tốc độ">Tốc độ tải trang</option>
+                    <option value="Sản phẩm">Sản phẩm</option>
+                    <option value="Dịch vụ">Dịch vụ khách hàng</option>
+                </select>
+            </div>
+
+            <!-- Comment -->
+            <div class="mb-6">
+                <label for="comment" class="block text-gray-700 font-semibold mb-2">
+                    Nhận xét của bạn (Tùy chọn)
+                </label>
+                <textarea 
+                    id="comment" 
+                    name="comment" 
+                    rows="4" 
+                    maxlength="500"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Chia sẻ trải nghiệm của bạn về website..."
+                ></textarea>
+                <p class="text-sm text-gray-500 mt-1">
+                    <span id="charCount">0</span>/500 ký tự
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+                type="submit" 
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+            >
+                Gửi đánh giá
+            </button>
+        </form>
+    </div>
+
+    <!-- Existing Feedback (if any) -->
+    <div id="existingFeedback" class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 hidden">
+        <p class="text-yellow-800 font-semibold">Bạn đã đánh giá website rồi!</p>
+        <p class="text-yellow-700 text-sm mt-1">Bạn có thể cập nhật đánh giá của mình.</p>
+    </div>
+</div>
+
+<style>
+    .star {
+        font-size: 3rem;
+        cursor: pointer;
+        color: #d1d5db;
+        transition: color 0.2s;
+    }
+    .star.active {
+        color: #fbbf24;
+    }
+    .star:hover {
+        color: #fbbf24;
+    }
+</style>
+
+<script>
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating');
+        const ratingText = document.getElementById('ratingText');
+        const commentTextarea = document.getElementById('comment');
+        const charCount = document.getElementById('charCount');
+        const feedbackForm = document.getElementById('feedbackForm');
+
+        const ratingTexts = {
+            1: 'Rất tệ',
+            2: 'Không tốt',
+            3: 'Bình thường',
+            4: 'Tốt',
+            5: 'Rất tốt'
+        };
+
+        let selectedRating = 0;
+
+        // Star rating interaction
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                ratingInput.value = selectedRating;
+                ratingText.textContent = ratingTexts[selectedRating];
+                updateStars(selectedRating);
+            });
+
+            star.addEventListener('mouseenter', function() {
+                const hoverRating = parseInt(this.dataset.rating);
+                updateStars(hoverRating);
+            });
+        });
+
+        document.getElementById('starRating').addEventListener('mouseleave', function() {
+            updateStars(selectedRating);
+        });
+
+        function updateStars(rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Character count
+        commentTextarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Check if user already submitted feedback
+        async function checkExistingFeedback() {
+            try {
+                const response = await fetch('/api/feedback/my-feedback', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    // User already has feedback
+                    document.getElementById('existingFeedback').classList.remove('hidden');
+                    
+                    // Pre-fill form
+                    selectedRating = data.data.rating;
+                    ratingInput.value = selectedRating;
+                    ratingText.textContent = ratingTexts[selectedRating];
+                    updateStars(selectedRating);
+                    
+                    document.getElementById('category').value = data.data.category;
+                    commentTextarea.value = data.data.comment || '';
+                    charCount.textContent = commentTextarea.value.length;
+                    
+                    // Change button text
+                    feedbackForm.querySelector('button[type="submit"]').textContent = 'Cập nhật đánh giá';
+                }
+            } catch (error) {
+                console.error('Error checking feedback:', error);
+            }
+        }
+
+        // Submit form
+        feedbackForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!selectedRating) {
+                alert('Vui lòng chọn số sao đánh giá!');
+                return;
+            }
+
+            const formData = {
+                rating: selectedRating,
+                category: document.getElementById('category').value,
+                comment: commentTextarea.value.trim()
+            };
+
+            try {
+                // Check if updating or creating
+                const existingFeedbackDiv = document.getElementById('existingFeedback');
+                const isUpdate = !existingFeedbackDiv.classList.contains('hidden');
+
+                let response;
+                if (isUpdate) {
+                    // Get feedback ID from API
+                    const myFeedback = await fetch('/api/feedback/my-feedback', { credentials: 'include' });
+                    const myData = await myFeedback.json();
+                    
+                    response = await fetch(`/api/feedback/${myData.data._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    response = await fetch('/api/feedback', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(formData)
+                    });
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra!');
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('Có lỗi xảy ra khi gửi đánh giá!');
+            }
+        });
+
+        // Load existing feedback on page load
+        checkExistingFeedback();
+    </script>

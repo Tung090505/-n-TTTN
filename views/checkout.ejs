@@ -129,7 +129,15 @@
                         <div class="flex justify-between text-sm text-slate-500">
                             <span>Phí ship:</span>
                             <span id="shipping-fee-text" class="font-bold text-emerald-500">
-                                <%= (cart.totalAmount >= 5000000 || ['gold', 'diamond'].includes(user.membershipLevel)) ? 'Miễn phí' : '30.000đ' %>
+                                <% 
+                                    let initialShippingFee = 30000;
+                                    if (cart.totalAmount >= 5000000) {
+                                        initialShippingFee = 0;
+                                    } else if (['gold', 'diamond'].includes(user.membershipLevel) && cart.totalAmount >= 500000) {
+                                        initialShippingFee = 0;
+                                    }
+                                %>
+                                <%= initialShippingFee === 0 ? 'Miễn phí' : '30.000đ' %>
                             </span>
                         </div>
 
@@ -190,7 +198,14 @@
         const tierRate = tierRates[membershipLevel] || 0;
         const tierDiscount = Math.round(subtotal * tierRate);
         
-        let shippingFee = (subtotal >= 5000000 || ['gold', 'diamond'].includes(membershipLevel)) ? 0 : 30000;
+        // Calculate shipping fee with new logic
+        let shippingFee = 30000; // Default
+        if (subtotal >= 5000000) {
+            shippingFee = 0; // Free for orders >= 5M
+        } else if (['gold', 'diamond'].includes(membershipLevel) && subtotal >= 500000) {
+            shippingFee = 0; // Free for Gold/Diamond if order >= 500k
+        }
+        
         let currentPointsDiscount = 0;
         let currentCouponDiscount = 0;
         let appliedCouponCode = null;

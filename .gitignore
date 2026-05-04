@@ -29,3 +29,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# AI-DLC Workflows (embedded git repository)
+Aws/

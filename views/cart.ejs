@@ -76,13 +76,23 @@
                                 </div>
                                 <div class="flex justify-between text-slate-500 font-medium">
                                     <span>Vận chuyển</span>
-                                    <span class="text-emerald-500 font-bold">Miễn phí ⚡</span>
+                                    <% 
+                                        let shippingFee = 30000;
+                                        if (cart.totalAmount >= 5000000) {
+                                            shippingFee = 0;
+                                        } else if (['gold', 'diamond'].includes(user.membershipLevel) && cart.totalAmount >= 500000) {
+                                            shippingFee = 0;
+                                        }
+                                    %>
+                                    <span class="<%= shippingFee === 0 ? 'text-emerald-500 font-bold' : 'text-slate-900' %>">
+                                        <%= shippingFee === 0 ? 'Miễn phí ⚡' : '30.000đ' %>
+                                    </span>
                                 </div>
                                 <div class="h-px bg-slate-100 my-4"></div>
                                 <div class="flex justify-between items-end">
                                     <span class="font-bold text-slate-600">Tổng tiền</span>
                                     <span class="text-3xl font-black text-blue-600">
-                                        <%= cart.totalAmount.toLocaleString('vi-VN') %>đ
+                                        <%= (cart.totalAmount + shippingFee).toLocaleString('vi-VN') %>đ
                                     </span>
                                 </div>
                             </div>

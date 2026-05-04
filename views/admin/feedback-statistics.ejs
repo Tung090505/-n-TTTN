@@ -1,0 +1,318 @@
+<% layout('layouts/main') %>
+
+<div class="flex min-h-screen bg-slate-50">
+    <!-- Sidebar -->
+    <%- include('../partials/admin-sidebar', { active: 'feedback' }) %>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 space-y-8">
+        <h1 class="text-3xl font-bold text-gray-800">📊 Thống kê Đánh giá Website</h1>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-8 rounded-[2rem] border-l-8 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Tổng đánh giá</p>
+                        <p class="text-3xl font-black text-slate-900" id="totalFeedbacks">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-[2rem] border-l-8 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Điểm trung bình</p>
+                        <p class="text-3xl font-black text-yellow-500" id="avgRating">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center">
+                        <svg class="w-7 h-7 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-[2rem] border-l-8 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Đánh giá tốt</p>
+                        <p class="text-3xl font-black text-green-500" id="goodRatings">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
+                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-[2rem] border-l-8 border-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Đánh giá xấu</p>
+                        <p class="text-3xl font-black text-red-500" id="badRatings">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center">
+                        <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Bar Chart -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Phân bố đánh giá</h2>
+                <canvas id="barChart"></canvas>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Tỷ lệ phần trăm</h2>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Table -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Chi tiết đánh giá</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mức đánh giá</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phần trăm</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Biểu đồ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Feedbacks List -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Tất cả đánh giá</h2>
+            <div id="feedbacksList" class="space-y-4">
+                <!-- Feedbacks will be inserted here -->
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+        let barChart, pieChart;
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/feedback/statistics', {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.data;
+                    
+                    // Update summary cards
+                    document.getElementById('totalFeedbacks').textContent = stats.total;
+                    document.getElementById('avgRating').textContent = stats.avgRating + ' ⭐';
+                    
+                    // Calculate good (4-5 stars) and bad (1-2 stars) ratings
+                    const goodCount = stats.breakdown.filter(item => item.rating >= 4).reduce((sum, item) => sum + item.count, 0);
+                    const badCount = stats.breakdown.filter(item => item.rating <= 2).reduce((sum, item) => sum + item.count, 0);
+                    
+                    document.getElementById('goodRatings').textContent = goodCount;
+                    document.getElementById('badRatings').textContent = badCount;
+
+                    // Render charts
+                    renderCharts(stats.breakdown);
+
+                    // Render table
+                    renderTable(stats.breakdown);
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        function renderCharts(breakdown) {
+            const labels = breakdown.map(item => item.ratingText + ' (' + item.rating + '⭐)');
+            const data = breakdown.map(item => item.count);
+            const percentages = breakdown.map(item => item.percentage);
+
+            const colors = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'];
+
+            // Bar Chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            if (barChart) barChart.destroy();
+            barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng đánh giá',
+                        data: data,
+                        backgroundColor: colors.reverse(),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Pie Chart
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+            pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const percentage = percentages[context.dataIndex];
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTable(breakdown) {
+            const tbody = document.getElementById('statsTableBody');
+            tbody.innerHTML = '';
+
+            breakdown.forEach(item => {
+                const stars = '⭐'.repeat(item.rating);
+                const barWidth = item.percentage;
+                
+                const row = `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-2">${stars}</span>
+                                <span class="font-medium">${item.ratingText}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-lg font-semibold">${item.count}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-lg font-semibold">${item.percentage}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-blue-600 h-4 rounded-full" style="width: ${barWidth}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        async function loadAllFeedbacks() {
+            try {
+                const response = await fetch('/api/feedback', {
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    const feedbacksList = document.getElementById('feedbacksList');
+                    feedbacksList.innerHTML = '';
+
+                    result.data.forEach(feedback => {
+                        const stars = '⭐'.repeat(feedback.rating);
+                        const date = new Date(feedback.createdAt).toLocaleDateString('vi-VN');
+                        
+                        const feedbackCard = `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="text-2xl">${stars}</span>
+                                            <span class="font-semibold text-gray-800">${feedback.ratingText}</span>
+                                            <span class="text-sm text-gray-500">• ${feedback.category}</span>
+                                        </div>
+                                        <p class="text-gray-700 mb-2">${feedback.comment || '<em>Không có nhận xét</em>'}</p>
+                                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                                            <span>👤 ${feedback.user.name}</span>
+                                            <span>📧 ${feedback.user.email}</span>
+                                            <span>📅 ${date}</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="deleteFeedback('${feedback._id}')" class="text-red-500 hover:text-red-700">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        feedbacksList.innerHTML += feedbackCard;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading feedbacks:', error);
+            }
+        }
+
+        async function deleteFeedback(id) {
+            if (!confirm('Bạn có chắc muốn xóa đánh giá này?')) return;
+
+            try {
+                const response = await fetch(`/api/feedback/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Xóa thành công!');
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra!');
+                }
+            } catch (error) {
+                console.error('Error deleting feedback:', error);
+                alert('Có lỗi xảy ra!');
+            }
+        }
+
+        // Load data on page load
+        loadStatistics();
+        loadAllFeedbacks();
+    </script>

@@ -32,6 +32,13 @@
             <% if(active==='chat' ) { %> <span class="text-xs opacity-50">→</span><% } %>
         </a>
 
+        <!-- Thống kê Đánh giá - Cả Admin và Staff đều thấy -->
+        <a href="/admin/thong-ke-danh-gia"
+            class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'feedback' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">
+            <span class="flex items-center gap-3">⭐ Thống kê Đánh giá</span>
+            <% if(active==='feedback' ) { %> <span class="text-xs opacity-50">→</span><% } %>
+        </a>
+
         <% if (user && user.role === 'admin') { %>
         <a href="/admin/nguoi-dung"
             class="flex items-center justify-between px-6 py-4 rounded-2xl <%= active === 'users' ? 'bg-slate-900 text-white font-bold shadow-lg shadow-slate-900/20' : 'bg-white text-slate-600 hover:bg-slate-50 font-bold border border-slate-100' %> transition-all">

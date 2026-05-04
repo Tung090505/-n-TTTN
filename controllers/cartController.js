@@ -104,10 +104,18 @@ exports.updateCartItem = async (req, res, next) => {
 
         const newQuantity = item.quantity + Number(quantityChange);
 
-        if (quantityChange > 0) {
+        // Always validate against current stock, regardless of increase or decrease
+        if (newQuantity > 0) {
             const product = await Product.findById(productId);
-            if (product && product.stock < newQuantity) {
-                return next(new AppError(`Chỉ còn ${product.stock} sản phẩm trong kho.`, 400));
+            if (!product) {
+                return next(new AppError('Sản phẩm không tồn tại.', 404));
+            }
+            
+            if (product.stock < newQuantity) {
+                return next(new AppError(
+                    `Chỉ còn ${product.stock} sản phẩm trong kho. Bạn không thể có ${newQuantity} sản phẩm trong giỏ.`, 
+                    400
+                ));
             }
         }
 

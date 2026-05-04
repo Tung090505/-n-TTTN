@@ -35,4 +35,12 @@ router.get('/ma-giam-gia', ...adminOnly, couponController.getAdminCoupons);
 router.post('/ma-giam-gia', ...adminOnly, couponController.createCoupon);
 router.put('/ma-giam-gia/:id/toggle-status', ...adminOnly, couponController.toggleCouponStatus);
 
+// Thống kê đánh giá - Cả 2
+router.get('/thong-ke-danh-gia', ...staffAndAdmin, (req, res) => {
+    res.render('admin/feedback-statistics', {
+        title: 'Thống kê Đánh giá | Admin',
+        active: 'feedback'
+    });
+});
+
 module.exports = router;

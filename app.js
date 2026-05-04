@@ -27,6 +27,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const errorHandler = require('./middleware/errorHandler');
 
@@ -158,6 +159,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/admin', adminRoutes);   
 app.use('/', aiRoutes);          
 app.use('/api/payment', paymentRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.use((req, res, next) => {
     const error = new Error(`Không tìm thấy trang: ${req.originalUrl}`);

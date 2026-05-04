@@ -12,8 +12,11 @@ exports.createOrder = async (req, res, next) => {
         const User = require('../models/User');
         const user = await User.findById(req.user.id);
 
-        if (pointsUsed > user.points) {
-            return next(new AppError('Bạn không có đủ điểm tích lũy.', 400));
+        // Validate points
+        if (pointsUsed && pointsUsed > 0) {
+            if (pointsUsed > user.points) {
+                return next(new AppError('Bạn không có đủ điểm tích lũy.', 400));
+            }
         }
 
         const cart = await Cart.findOne({ user: req.user.id })
@@ -54,15 +57,88 @@ exports.createOrder = async (req, res, next) => {
             });
         }
 
+        // Atomic stock update - Fix race condition
+        // Update stock using atomic operation to prevent overselling
+        const stockUpdateResults = await Promise.all(
+            stockUpdates.map(({ productId, quantity }) =>
+                Product.findOneAndUpdate(
+                    { 
+                        _id: productId, 
+                        stock: { $gte: quantity } // Only update if stock is sufficient
+                    },
+                    { 
+                        $inc: { stock: -quantity, sold: quantity }
+                    },
+                    { new: true }
+                )
+            )
+        );
+
+        // Check if any stock update failed (product out of stock)
+        const failedUpdate = stockUpdateResults.findIndex(result => result === null);
+        if (failedUpdate !== -1) {
+            // Rollback successful updates
+            const successfulUpdates = stockUpdateResults.slice(0, failedUpdate);
+            await Promise.all(
+                successfulUpdates.map((product, index) =>
+                    Product.findByIdAndUpdate(product._id, {
+                        $inc: { 
+                            stock: stockUpdates[index].quantity, 
+                            sold: -stockUpdates[index].quantity 
+                        }
+                    })
+                )
+            );
+            
+            const failedProduct = cart.items[failedUpdate].product;
+            return next(new AppError(
+                `Sản phẩm "${failedProduct.name}" đã hết hàng trong lúc bạn đặt hàng. Vui lòng thử lại.`,
+                400
+            ));
+        }
+
         const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-        const shippingFee = subtotal >= 5000000 ? 0 : 30000; 
+        
+        // Validate max points can use (1 point = 1000 VND)
+        const maxPointsCanUse = Math.floor(subtotal / 1000);
+        if (pointsUsed && pointsUsed > maxPointsCanUse) {
+            // Rollback stock updates
+            await Promise.all(
+                stockUpdateResults.map((product, index) =>
+                    Product.findByIdAndUpdate(product._id, {
+                        $inc: { 
+                            stock: stockUpdates[index].quantity, 
+                            sold: -stockUpdates[index].quantity 
+                        }
+                    })
+                )
+            );
+            
+            return next(new AppError(
+                `Bạn chỉ có thể dùng tối đa ${maxPointsCanUse} điểm cho đơn hàng này (1 điểm = 1,000 VNĐ).`,
+                400
+            ));
+        }
+        
+        // Calculate shipping fee
+        let shippingFee = 30000; // Default shipping fee
+
+        // Free shipping if order >= 5M (for all customers)
+        if (subtotal >= 5000000) {
+            shippingFee = 0;
+        }
 
         if (!shippingAddress.fullName) {
             shippingAddress.fullName = `${req.user.lastName} ${req.user.firstName}`;
         }
 
-        // O2O Logistics & Loyalty Ship: Free shipping if pick up at store OR if Gold/Diamond member
-        if (deliveryMethod === 'store_pickup' || ['gold', 'diamond'].includes(user.membershipLevel)) {
+        // O2O Logistics: Free shipping if pick up at store (customer comes to get it)
+        if (deliveryMethod === 'store_pickup') {
+            shippingFee = 0;
+        }
+
+        // Loyalty Ship: Free shipping for Gold/Diamond members if order >= 500k
+        if (['gold', 'diamond'].includes(user.membershipLevel) && subtotal >= 500000) {
             shippingFee = 0;
         }
 
@@ -71,9 +147,10 @@ exports.createOrder = async (req, res, next) => {
         const tierRate = tierDiscountRates[user.membershipLevel] || 0;
         const tierDiscount = Math.round(subtotal * tierRate);
 
-        // Coupons
+        // Coupons - validate but don't increment usedCount yet
         let couponDiscount = 0;
         let couponId = null;
+        let couponToUpdate = null;
         if (req.body.couponCode) {
             const Coupon = require('../models/Coupon');
             const coupon = await Coupon.findOne({ code: req.body.couponCode.toUpperCase() });
@@ -87,8 +164,7 @@ exports.createOrder = async (req, res, next) => {
                     couponDiscount = coupon.discountAmount;
                 }
                 couponId = coupon._id;
-                coupon.usedCount += 1;
-                await coupon.save();
+                couponToUpdate = coupon; // Save reference to update later
             }
         }
 
@@ -115,19 +191,26 @@ exports.createOrder = async (req, res, next) => {
             }],
         });
 
+        // Order created successfully - now update coupon usedCount
+        if (couponToUpdate) {
+            couponToUpdate.usedCount += 1;
+            await couponToUpdate.save();
+        }
+
         // Deduct points from user immediately if used
         if (pointsUsed > 0) {
             user.points -= pointsUsed;
             await user.save();
         }
 
-        await Promise.all(
-            stockUpdates.map(({ productId, quantity }) =>
-                Product.findByIdAndUpdate(productId, {
-                    $inc: { stock: -quantity, sold: quantity },
-                })
-            )
-        );
+        // Stock already updated atomically above - remove duplicate update
+        // await Promise.all(
+        //     stockUpdates.map(({ productId, quantity }) =>
+        //         Product.findByIdAndUpdate(productId, {
+        //             $inc: { stock: -quantity, sold: quantity },
+        //         })
+        //     )
+        // );
 
         await Cart.findOneAndUpdate(
             { user: req.user.id },
@@ -218,6 +301,7 @@ exports.cancelOrder = async (req, res, next) => {
 
         await order.save();
 
+        // Restore product stock
         await Promise.all(
             order.items.map(item =>
                 Product.findByIdAndUpdate(item.product, {
@@ -225,6 +309,14 @@ exports.cancelOrder = async (req, res, next) => {
                 })
             )
         );
+
+        // Restore points if used
+        if (order.pointsUsed > 0) {
+            const User = require('../models/User');
+            await User.findByIdAndUpdate(order.user, {
+                $inc: { points: order.pointsUsed }
+            });
+        }
 
         res.status(200).json({
             success: true,

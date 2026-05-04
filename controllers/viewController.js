@@ -192,3 +192,10 @@ exports.getWishlist = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getFeedback = (req, res) => {
+    res.render('feedback', { 
+        title: 'Đánh giá Website | TechStore',
+        user: req.user
+    });
+};

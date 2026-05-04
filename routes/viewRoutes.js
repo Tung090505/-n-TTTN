@@ -19,5 +19,6 @@ router.get('/tai-khoan', protectView, viewController.getProfile);
 router.get('/tai-khoan/don-hang', protectView, viewController.getMyOrders);
 router.get('/tai-khoan/don-hang/:orderCode', protectView, viewController.getOrderDetail);
 router.get('/tai-khoan/yeu-thich', protectView, viewController.getWishlist);
+router.get('/danh-gia-website', protectView, viewController.getFeedback);
 
 module.exports = router;
