@@ -642,12 +642,12 @@
                         <img src="${p.thumbnail || '/images/default-product.webp'}" alt="${p.name}" class="w-14 h-14 object-contain">
                     </div>
                     <!--Thông tin-->
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 pr-4">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="text-xs font-bold ${badgeClass} px-2 py-0.5 rounded-full border">${badgeText}</span>
                             <span class="text-xs font-bold text-slate-400 uppercase">${info.label}</span>
                         </div>
-                        <a href="/san-pham/${p.slug}" target="_blank" class="text-sm font-bold text-slate-800 hover:text-blue-600 transition-colors line-clamp-1">${p.name}</a>
+                        <a href="/san-pham/${p.slug}" target="_blank" class="text-sm font-bold text-slate-800 hover:text-blue-600 transition-colors line-clamp-1 block mb-1">${p.name}</a>
                         <p class="text-xs text-slate-400 mt-0.5">${p.brand || ''} • Rating: ${p.rating || 0}</p>
                     </div>
                     <!--Giá -->
