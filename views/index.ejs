@@ -188,14 +188,14 @@
                                 <img src="<%= p.thumbnail %>" alt="<%= p.name %>" class="max-w-full max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700">
                             </a>
                   
-                            <div class="flex-grow px-2">
+                            <div class="flex-grow px-2 mb-4">
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider"><%= p.brand %></span>
                                     <% if (p.isNewArrival) { %>
                                         <span class="px-2 py-0.5 rounded-md badge-new text-[10px] font-bold text-white uppercase tracking-wider">MỚI</span>
                                     <% } %>
                                 </div>
-                                <h3 class="font-bold text-slate-900 leading-snug mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 min-h-[3rem] text-sm md:text-base">
+                                <h3 class="font-bold text-slate-900 leading-snug mb-4 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm md:text-base" style="min-height: 2.5rem;">
                                     <a href="/san-pham/<%= p.slug %>"><%= p.name %></a>
                                 </h3>
                                 
